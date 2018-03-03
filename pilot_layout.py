@@ -5,8 +5,38 @@ import numpy as np
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.Qt import *
-    
-class Ui_MainWindow(object):
+
+
+#class for paintEvent, LED indicators, acts same as a general pyqt widget?
+class CircleWidget(QWidget):
+    def __init__(self, parent, aNumber, theX, theY):
+        QWidget.__init__(self, parent)
+        self.number = aNumber
+        self.xVal = theX        
+        self.yVal = theY
+        
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing) #makes nicer circles
+        radx = 10; rady = 10
+        center = QPoint(self.xVal, self.yVal)
+        # draw red circle
+        if (self.number == 0):
+            p.setPen(Qt.red)
+            p.setBrush(Qt.darkRed)  #set fill colour
+            p.drawEllipse(center, radx, rady)
+        else:
+            p.setPen(Qt.green)        
+            p.setBrush(Qt.darkGreen)
+            p.drawEllipse(center, radx, rady)        
+#e.g. of CircleWidget class instance: icon = CircleWidget(self, 0, 100, 50)     
+#2nd argument =aNumber, 3rd =x-coordinate, 4th =y-coordinate 
+#self.setCentralWidget(icon)
+
+#end of CircleWidget class
+
+#class Ui_MainWindow(object):
+class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         MainWindow.resize(905, 700) # x=905, y=700
         self.centralwidget = QWidget(MainWindow)
@@ -23,6 +53,8 @@ class Ui_MainWindow(object):
         self.button = QPushButton('Quit', MainWindow)
         self.button.setGeometry(0, 0, 100, 30)
         self.button.clicked.connect(self.close_application)
+        
+        self.icon = CircleWidget(self, 0, 200, 500)
         
         self.slider = QSlider(MainWindow)
         self.slider.setRange(0, 6)

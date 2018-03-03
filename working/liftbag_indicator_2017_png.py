@@ -55,27 +55,6 @@ class Window(QWidget):
         self.setGeometry(300, 300, 300, 150)
         self.setWindowTitle('Buttons')    
         self.show()
-
-'''
-# need to perhaps have two of paintEvent for each indicator, using the joystick output
-# so just replace the existing LED1_button if statements with paintEvent code? 
-    def paintEvent(self, event):
-        paint = QPainter()
-        paint.begin(self)
-        paint.setRenderHint(QPainter.Antialiasing) #makes nicer circles
-        radx = 10; rady = 10
-        # draw red circles
-        paint.setPen(Qt.green)
-        center = QPoint(80, 120)
-        paint.setBrush(Qt.darkGreen)  #set fill colour
-        paint.drawEllipse(center, radx, rady)
-        #beginning of green circle
-        paint.setPen(Qt.green)
-        center2 = QPoint(230, 120)        
-        paint.setBrush(Qt.darkGreen)
-        paint.drawEllipse(center2, radx, rady)        
-        paint.end()            
-'''
         
         
 def main():
@@ -86,5 +65,3 @@ def main():
         
 if __name__ == '__main__':
     main()
-
-

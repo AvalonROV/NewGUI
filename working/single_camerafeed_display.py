@@ -5,12 +5,10 @@ from PyQt4 import QtGui, QtCore, Qt
     
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.resize(923, 602)
+        MainWindow.resize(823, 602)
         self.centralwidget = QtGui.QWidget(MainWindow)
-        self.videoFrame1 = QtGui.QLabel(self.centralwidget)
-        self.videoFrame1.setGeometry(QtCore.QRect(40, 32, 415, 300))
-        self.videoFrame2 = QtGui.QLabel(self.centralwidget)
-        self.videoFrame2.setGeometry(QtCore.QRect(460, 32, 415, 300))
+        self.videoFrame = QtGui.QLabel(self.centralwidget)
+        self.videoFrame.setGeometry(QtCore.QRect(40, 32, 721, 521))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 823, 21))
@@ -63,29 +61,18 @@ class Gui(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self,parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.video1 = Video(cv2.VideoCapture(0))
-        self.video2 = Video(cv2.VideoCapture(0))
+        self.video = Video(cv2.VideoCapture(0))
         self._timer = QtCore.QTimer(self)
-        self._timer.timeout.connect(self.play1)
-        self._timer.timeout.connect(self.play2)
+        self._timer.timeout.connect(self.play)
         self._timer.start(27)
         self.update()
  
-    def play1(self):
+    def play(self):
         try:
-            self.video1.captureNextFrame()
-            self.ui.videoFrame1.setPixmap(
-                self.video1.convertFrame())
-            self.ui.videoFrame1.setScaledContents(True)
-        except TypeError:
-            print("No frame")
-            
-    def play2(self):
-        try:
-            self.video2.captureNextFrame()
-            self.ui.videoFrame2.setPixmap(
-                self.video2.convertFrame())
-            self.ui.videoFrame2.setScaledContents(True)
+            self.video.captureNextFrame()
+            self.ui.videoFrame.setPixmap(
+                self.video.convertFrame())
+            self.ui.videoFrame.setScaledContents(True)
         except TypeError:
             print("No frame")
  
