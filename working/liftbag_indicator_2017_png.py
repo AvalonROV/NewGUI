@@ -10,6 +10,31 @@ import pygame
 
 app = QApplication(sys.argv)
 
+class CircleWidget(QWidget):
+    def __init__(self, parent, aNumber, theX, theY):
+        QWidget.__init__(self, parent)      #getting rid of parent here and line above, and self in 'icon=' does work
+        self.number = aNumber
+        self.xVal = theX
+        self.yVal = theY
+        
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing) #makes nicer circles
+        radx = 10; rady = 10
+        center = QPoint(self.xVal, self.yVal)
+        # draw red circle
+        if (self.number == 0):
+            p.setPen(Qt.red)
+            #center = QPoint(self.xVal, self.yVal)
+            p.setBrush(Qt.darkRed)  #set fill colour
+            p.drawEllipse(center, radx, rady)
+        else:
+            p.setPen(Qt.green)
+            #center = QPoint(self.xVal, self.yVal)        
+            p.setBrush(Qt.darkGreen)
+            p.drawEllipse(center, radx, rady)        
+
+
 class Window(QWidget):
     
     def __init__(self):
@@ -30,10 +55,12 @@ class Window(QWidget):
         self.led2_label = QLabel('detatch')
         self.led1_indicator = QLabel() 	#one for each indicator needed
         self.led2_indicator = QLabel()
-        self.redcircle_indicator = QPixmap("red.png")
-        self.greencircle_indicator = QPixmap("green.png")
-        self.led1_indicator.setPixmap(self.redcircle_indicator)
-        self.led2_indicator.setPixmap(self.redcircle_indicator) #initialise both as red
+        #self.redcircle_indicator = QPixmap("red_circle.png")
+        #self.greencircle_indicator = QPixmap("green_circle.png")
+        self.redcircle_indicator = CircleWidget(self, 0, 100, 50)     
+        self.greencircle_indicator = CircleWidget(self, 0, 10, 10)     
+        #self.led1_indicator.setPixmap(self.redcircle_indicator)
+        #self.led2_indicator.setPixmap(self.redcircle_indicator) #initialise both as red
 
         vbox = QVBoxLayout()
         vbox.addWidget(application_title)

@@ -9,8 +9,9 @@ information.
 """
 
 #============== Imports ========================
-
+import cv2
 import sys
+import numpy as np
 from PyQt4.QtGui import*
 from PyQt4.QtCore import *
 import pygame
@@ -50,40 +51,13 @@ app = QApplication(sys.argv) # Creat a new QApplication object. This manages
 LED1 = 0
 LED2 = 0
 
-#class for paintEvent, LED indicators, acts same as a general pyqt widget?
-class CircleWidget(QWidget):
-    def __init__(self, parent, aNumber, theX, theY):
-        QWidget.__init__(self, parent)
-        self.number = aNumber
-        self.xVal = theX        
-        self.yVal = theY
-        
-       def paintEvent(self, event):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing) #makes nicer circles
-        radx = 10; rady = 10
-        center = QPoint(self.xVal, self.yVal)
-        # draw red circle
-        if (self.number == 0):
-            p.setPen(Qt.red)
-            p.setBrush(Qt.darkRed)  #set fill colour
-            p.drawEllipse(center, radx, rady)
-        else:
-            p.setPen(Qt.green)        
-            p.setBrush(Qt.darkGreen)
-            p.drawEllipse(center, radx, rady)        
-#e.g. of CircleWidget class instance: icon = CircleWidget(self, 0, 100, 50)     
-#2nd argument =aNumber, 3rd =x-coordinate, 4th =y-coordinate 
-#self.setCentralWidget(icon)
 
-#end of CircleWidget class
-
-class Window(QWidget):
+class Gui(QWidget):
     """
     This class is the base class of all user interface objects. 
     """
     def __init__(self):
-        super(Window, self).__init__()
+        super(Gui, self).__init__()
         
         self.initUI()
         self.string_formatter()
@@ -98,6 +72,33 @@ class Window(QWidget):
 
         recieve_socket.setblocking(0) #Stop the socket from blocking the code while awaiting data
                                       #In other words: set timeout to 0
+        #video 
+        self.video1 = Video(cv2.VideoCapture(0))        #an object of class Video(argument)
+        self.video2 = Video(cv2.VideoCapture(0))        #edit integer to change feed source
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self.play1)
+        self._timer.timeout.connect(self.play2)
+        self._timer.start(27)
+        self.update()
+        
+    def play1(self):
+        try:
+            self.video1.captureNextFrame()
+            self.video_frame1.setPixmap(
+                self.video1.convertFrame())
+            self.video_frame1.setScaledContents(True)
+        except TypeError:
+            print("No frame")
+            
+    def play2(self):
+        try:
+            self.video2.captureNextFrame()
+            self.video_frame2.setPixmap(
+                self.video2.convertFrame())
+            self.video_frame2.setScaledContents(True)
+        except TypeError:
+            print("No frame")
+
     def initUI(self):
 
         #================ Definitions ========================
@@ -109,22 +110,23 @@ class Window(QWidget):
         application_title.setFont(title1_font)              #Set font
         application_title.setAlignment(Qt.AlignCenter)      #Set Allignment
 
-        # LEDs
-        self.LEDs_label = QLabel()              #Create label for the section title
-        self.LEDs_label.setText("LEDs")         #Set Text
+        self.video_frame1 = QLabel()
+        self.video_frame1.resize(100, 140)
+        self.video_frame2 = QLabel()
+        self.video_frame2.resize(100, 140)
+        
+        self.quit_button = QPushButton('Quit')
+        self.quit_button.clicked.connect(self.close_app)
+        self.icon1 = colour_box1("255, 0, 0")           #r, g, b
+        self.icon2 = colour_box2("255, 0, 0")
+        self.indicator1 = QLabel('inflate lifting bag')
+        self.indicator2 = QLabel('detatch lifting bag')
+        self.indicator3 = QLabel('drop power circuit')
+        self.indicator4 = QLabel('depth reading')
 
-        self.led1_label = QLabel()              #Create label for LED1
-        self.led1_label.setText("Spectrum")     #Set Text
-        self.led2_label = QLabel()              #Create label for LED2
-        self.led2_label.setText("Lights")       #Set Text
-
-        self.led1_indicator = QLabel()          #Create label for LED1 indicator
-        self.led2_indicator = QLabel()          #Create label for LED2 indicator
-        self.red_circle_indicator = QPixmap('red_circle.png')       #Use an image of a red circle to indicate that the LEDs are off
-        self.green_circle_indicator = QPixmap('green_circle.png')   #Use an image of a green circle to indicate that the LEDs are on
-        self.led1_indicator.setPixmap(self.red_circle_indicator)
-        self.led2_indicator.setPixmap(self.red_circle_indicator)
-
+        self.cam_slider = QSlider()
+        self.cam_slider.setRange(0, 6)
+        self.cam_slider.setTickPosition(3)
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
         self.recieved_string_txtbox = QTextEdit()   #Create a text box to store the data received from the ROV
@@ -135,32 +137,29 @@ class Window(QWidget):
 
 
         #================ Layout ========================
-        vbox = QVBoxLayout()                #Create layout container
-        vbox.addWidget(application_title)   #Populate the container
-
-        vbox.addWidget(self.LEDs_label)
-
-        LEDs_hbox = QHBoxLayout()           #Create layout container
-        LEDs_hbox.addWidget(self.led1_label)#Populate the container
-        LEDs_hbox.addWidget(self.led1_indicator)
-        LEDs_hbox.addWidget(self.led2_label)
-        LEDs_hbox.addWidget(self.led2_indicator)
-
-        vbox.addLayout(LEDs_hbox)
-
-        vbox.addWidget(self.recieved_string_label)
+        grid = QGridLayout()              #Create layout container
+        grid.addWidget(self.video_frame1, 1, 1, 2, 2)
+        grid.addWidget(self.video_frame2, 1, 2, 2, 2)
         
-        recieved_string_box = QHBoxLayout() #Create layout container
-        recieved_string_box.addWidget(self.recieved_string_txtbox)  #Populate the container
-        recieved_string_box.addWidget(self.user_input)
-
-        vbox.addLayout(recieved_string_box)
-
-        self.setLayout(vbox)    #Set the layout
+        grid.addWidget(self.cam_slider, 1, 9, 1, 1)
+        grid.addWidget(self.indicator1, 6, 2, 1, 1)
+        grid.addWidget(self.indicator2, 7, 2, 1, 1)
+        grid.addWidget(self.indicator3, 8, 2, 1, 1)
+        grid.addWidget(self.indicator4, 9, 2, 1, 1)
+        grid.addWidget(self.icon1, 6, 3)
+        grid.addWidget(self.icon2, 7, 3)
+        grid.addWidget(self.quit_button, 10, 1)
         
-        self.setGeometry(300, 300, 300, 150)
-        self.setWindowTitle('Buttons')    
+        
+        self.setLayout(grid)    #Set the layout
+        
+        self.setGeometry(10, 100, 600, 300)
+        self.setWindowTitle('Pilot GUI')    
         self.show()
+
+    def close_app(self):
+        print("Closing")
+        sys.exit()
 
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
@@ -336,6 +335,56 @@ class Window(QWidget):
         self.string_formatter()  # Calling the thruster value
 
 
+
+#---------------- beginning of video class
+class Video():
+    def __init__(self,capture):
+        self.capture = capture
+        self.currentFrame=np.array([])
+
+    def captureNextFrame(self):
+        """                           
+        capture frame and reverse RBG BGR and return opencv image                                      
+        """
+        ret, readFrame=self.capture.read()
+        if(ret==True):
+            self.currentFrame=cv2.cvtColor(readFrame,cv2.COLOR_BGR2RGB)
+
+    def convertFrame(self):
+        """     converts frame to format suitable for             """
+        try:
+            height,width=self.currentFrame.shape[:2]
+            img=QImage(self.currentFrame,
+                       width,
+                              height,
+                              QImage.Format_RGB888)
+            img=QPixmap.fromImage(img)
+            self.previousFrame = self.currentFrame
+            return img
+        except:
+            return None
+#---------------- end of video class
+
+class colour_box1(QLabel):
+    #Constructor
+    def __init__(self, box_colour):
+        super(colour_box1, self).__init__()
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+    
+    def change_colour(self, box_colour):
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+
+class colour_box2(QLabel):
+    #Constructor
+    def __init__(self, box_colour):
+        super(colour_box2, self).__init__()
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+    
+    def change_colour(self, box_colour):
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+#---------------- end of colour_box classes for LED indicators
+
+
 """
 This class is responsible for threading which means runnin two operations
 simultaneously. It emits a signal to define when the above program should be
@@ -360,7 +409,7 @@ class Worker(QThread):
 
 def main():
     
-    ex = Window()
+    ex = Gui()
     sys.exit(app.exec_())
 
 

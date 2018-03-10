@@ -49,6 +49,8 @@ class MyMainWindow(QMainWindow):
         self.setCentralWidget(icon)
         #button = QPushButton('button', icon)
         
+        
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     sw = MyMainWindow(None)

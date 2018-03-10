@@ -6,35 +6,6 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.Qt import *
 
-
-#class for paintEvent, LED indicators, acts same as a general pyqt widget?
-class CircleWidget(QWidget):
-    def __init__(self, parent, aNumber, theX, theY):
-        QWidget.__init__(self, parent)
-        self.number = aNumber
-        self.xVal = theX        
-        self.yVal = theY
-        
-    def paintEvent(self, event):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing) #makes nicer circles
-        radx = 10; rady = 10
-        center = QPoint(self.xVal, self.yVal)
-        # draw red circle
-        if (self.number == 0):
-            p.setPen(Qt.red)
-            p.setBrush(Qt.darkRed)  #set fill colour
-            p.drawEllipse(center, radx, rady)
-        else:
-            p.setPen(Qt.green)        
-            p.setBrush(Qt.darkGreen)
-            p.drawEllipse(center, radx, rady)        
-#e.g. of CircleWidget class instance: icon = CircleWidget(self, 0, 100, 50)     
-#2nd argument =aNumber, 3rd =x-coordinate, 4th =y-coordinate 
-#self.setCentralWidget(icon)
-
-#end of CircleWidget class
-
 #class Ui_MainWindow(object):
 class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
@@ -54,7 +25,15 @@ class Ui_MainWindow(QMainWindow):
         self.button.setGeometry(0, 0, 100, 30)
         self.button.clicked.connect(self.close_application)
         
-        self.icon = CircleWidget(self, 0, 200, 500)
+        self.icon1 = QLabel(MainWindow)
+        self.icon1.setGeometry(20, 470, 100, 30)
+        self.icon2 = QLabel(MainWindow)
+        self.icon1.setGeometry(150, 470, 100, 30)        
+        self.icon1.setStyleSheet("background-color: rgb(255, 5, 255)")        
+        #self.redblock = QPixmap()
+        #self.grnblock = QPixmap()
+        #self.redblock.fill(Qt.red)        
+        #self.icon1.setPixmap(self.redblock)
         
         self.slider = QSlider(MainWindow)
         self.slider.setRange(0, 6)
@@ -76,6 +55,16 @@ class Ui_MainWindow(QMainWindow):
     def close_application(self):
         print("Closing")
         sys.exit()
+
+class colour_box1(QLabel):
+    #Constructor
+    def __init__(self, box_colour):
+        super(colour_box, self).__init()
+        self.setGeometry(170, 470, 80, 30)
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+    
+    def change_colour(self, box_colour):
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
         
 class Video():
     def __init__(self,capture):
