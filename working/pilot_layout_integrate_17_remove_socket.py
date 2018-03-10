@@ -93,18 +93,20 @@ class Gui(QWidget):
         application_title.setAlignment(Qt.AlignCenter)      #Set Allignment
 
         self.video_frame1 = QLabel()
-        self.video_frame1.resize(100, 140)
         self.video_frame2 = QLabel()
-        self.video_frame2.resize(100, 140)
+        self.video_frame1.setMaximumSize(8*70, 6*70)          #640, 480; 8:6
+        self.video_frame2.setMaximumSize(8*70, 6*70)
         
-        self.quit_button = QPushButton('Quit')
-        self.quit_button.clicked.connect(self.close_app)
+        
+        #self.quit_button = QPushButton('Quit')
+        #self.quit_button.clicked.connect(self.close_app)
         self.icon1 = colour_box1("255, 0, 0")           #r, g, b
         self.icon2 = colour_box2("255, 0, 0")
-        self.indicator1 = QLabel('inflate lifting bag')
-        self.indicator2 = QLabel('detatch lifting bag')
-        self.indicator3 = QLabel('drop power circuit')
-        self.indicator4 = QLabel('depth reading')
+        self.icon3 = colour_box3("255, 0, 0")
+        self.indicator1 = QLabel('Inflating lifting bag')
+        self.indicator2 = QLabel('Detatching lifting bag')
+        self.indicator3 = QLabel('Dropping power circuit')
+        self.indicator4 = QLabel('Depth reading')
 
         self.cam_slider = QSlider()
         self.cam_slider.setRange(0, 6)
@@ -120,17 +122,20 @@ class Gui(QWidget):
 
         #================ Layout ========================
         grid = QGridLayout()              #Create layout container
-        grid.addWidget(self.video_frame1, 1, 1, 2, 2)
-        grid.addWidget(self.video_frame2, 1, 2, 2, 2)
+        grid.addWidget(self.video_frame1, 1, 1, 1, 2)
+        grid.addWidget(self.video_frame2, 1, 3, 1, 2)
         
         grid.addWidget(self.cam_slider, 1, 9, 1, 1)
-        grid.addWidget(self.indicator1, 6, 2, 1, 1)
-        grid.addWidget(self.indicator2, 7, 2, 1, 1)
-        grid.addWidget(self.indicator3, 8, 2, 1, 1)
-        grid.addWidget(self.indicator4, 9, 2, 1, 1)
-        grid.addWidget(self.icon1, 6, 3)
-        grid.addWidget(self.icon2, 7, 3)
-        grid.addWidget(self.quit_button, 10, 1)
+
+        grid.addWidget(self.indicator1, 6, 1, 1, 1)
+        grid.addWidget(self.indicator2, 7, 1, 1, 1)
+        grid.addWidget(self.indicator3, 8, 1, 1, 1)
+        grid.addWidget(self.indicator4, 9, 1, 1, 1)
+        grid.addWidget(self.icon1, 6, 2)
+        grid.addWidget(self.icon2, 7, 2)
+        grid.addWidget(self.icon3, 8, 2)
+
+        #grid.addWidget(self.quit_button, 10, 1)
         
         
         self.setLayout(grid)    #Set the layout
@@ -139,9 +144,9 @@ class Gui(QWidget):
         self.setWindowTitle('Pilot GUI')    
         self.show()
 
-    def close_app(self):
-        print("Closing")
-        sys.exit()
+    #def close_app(self):
+        #print("Closing")
+        #sys.exit()
 
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
@@ -271,20 +276,24 @@ class Gui(QWidget):
             sleep(0.2)
             if (LED1 == 1):
                 LED1 = 0
-                self.led1_indicator.setPixmap(self.red_circle_indicator)
+                self.icon1.change_colour("0, 255, 0")
+                #self.led1_indicator.setPixmap(self.red_circle_indicator)
             else:
                 LED1 = 1
-                self.led1_indicator.setPixmap(self.green_circle_indicator)
+                self.icon1.change_colour("0, 255, 0")
+                #self.led1_indicator.setPixmap(self.green_circle_indicator)
 
         # LED2
         if (self.LED2_button == 1):
             sleep(0.2)
             if (LED2 == 1):
                 LED2 = 0
-                self.led2_indicator.setPixmap(self.red_circle_indicator)
+                self.icon2.change_colour("255, 0, 0")
+                #self.led2_indicator.setPixmap(self.red_circle_indicator)
             else:
                 LED2 = 1
-                self.led2_indicator.setPixmap(self.green_circle_indicator)
+                self.icon2.change_colour("0, 255, 0")
+                #self.led2_indicator.setPixmap(self.green_circle_indicator)
 
         # Bluetooth
         if(self.BT_button1 == 1):
@@ -359,6 +368,15 @@ class colour_box2(QLabel):
     #Constructor
     def __init__(self, box_colour):
         super(colour_box2, self).__init__()
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+    
+    def change_colour(self, box_colour):
+        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
+
+class colour_box3(QLabel):
+    #Constructor
+    def __init__(self, box_colour):
+        super(colour_box3, self).__init__()
         self.setStyleSheet("background-color: rgb(" + box_colour + ")")
     
     def change_colour(self, box_colour):
