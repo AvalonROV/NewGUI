@@ -51,6 +51,7 @@ class Video():
                               QtGui.QImage.Format_RGB888)
             img=QtGui.QPixmap.fromImage(img)
             self.previousFrame = self.currentFrame
+            
             return img
         except:
             return None
