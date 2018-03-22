@@ -108,9 +108,13 @@ class Gui(QWidget):
         self.indicator3 = QLabel('Dropping power circuit')
         self.indicator4 = QLabel('Depth reading')
 
-        self.cam_slider = QSlider()
-        self.cam_slider.setRange(0, 6)
-        self.cam_slider.setTickPosition(3)
+        self.cam_slider1 = QSlider()
+        self.cam_slider1.setRange(0, 6)
+        self.cam_slider1.setTickPosition(3)
+        self.cam_slider2 = QSlider()
+        self.cam_slider2.setRange(0, 6)
+        self.cam_slider2.setTickPosition(3)
+        
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
         self.recieved_string_txtbox = QTextEdit()   #Create a text box to store the data received from the ROV
@@ -123,9 +127,10 @@ class Gui(QWidget):
         #================ Layout ========================
         grid = QGridLayout()              #Create layout container
         grid.addWidget(self.video_frame1, 1, 1, 1, 2)
-        grid.addWidget(self.video_frame2, 1, 3, 1, 2)
+        grid.addWidget(self.video_frame2, 1, 4, 1, 2)
         
-        grid.addWidget(self.cam_slider, 1, 9, 1, 1)
+        grid.addWidget(self.cam_slider1, 1, 3, 1, 1)
+        grid.addWidget(self.cam_slider2, 1, 6, 1, 1)
 
         grid.addWidget(self.indicator1, 6, 1, 1, 1)
         grid.addWidget(self.indicator2, 7, 1, 1, 1)
