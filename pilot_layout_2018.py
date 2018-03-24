@@ -114,7 +114,7 @@ class Gui(QWidget):
         self.cam_slider2 = QSlider()
         self.cam_slider2.setRange(0, 6)
         self.cam_slider2.setTickPosition(3)
-        
+
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
         self.recieved_string_txtbox = QTextEdit()   #Create a text box to store the data received from the ROV
@@ -128,7 +128,7 @@ class Gui(QWidget):
         grid = QGridLayout()              #Create layout container
         grid.addWidget(self.video_frame1, 1, 1, 1, 2)
         grid.addWidget(self.video_frame2, 1, 4, 1, 2)
-        
+
         grid.addWidget(self.cam_slider1, 1, 3, 1, 1)
         grid.addWidget(self.cam_slider2, 1, 6, 1, 1)
 
@@ -199,7 +199,7 @@ class Gui(QWidget):
         # Bluetooth controls
         self.BT_button1 = my_joystick.get_button(0)
         self.BT_button2 = my_joystick.get_button(1)
-        
+
         # Initital values
         self.BT = 0
         self.funnel = 0

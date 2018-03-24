@@ -1,163 +1,190 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import sys
-from PyQt4 import QtGui, QtCore
+import numpy as np
 import math
+from PyQt4.QtGui import*
+from PyQt4.QtCore import *
 
-class Example(QtGui.QWidget):
-    
+
+app = QApplication(sys.argv) # Creat a new QApplication object. This manages
+                                # the GUI application's control flow and main
+                                # settings.
+
+class Gui(QWidget):
+#base class of all user interface objects. 
+
     def __init__(self):
-        super(Example, self).__init__()
-        
+        super(Gui, self).__init__()
         self.initUI()
-        
+
     def initUI(self):
-        CalcBtn = QtGui.QPushButton('Calculate')
-        CalcBtn.clicked.connect(self.calculate)
-        Quit = QtGui.QPushButton('Quit')
-        Quit.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        
-        blank = QtGui.QLabel('')
-        TOL = QtGui.QLabel('Take-off Location')
-        Heading = QtGui.QLabel('Heading (degrees)')
-        AscAS = QtGui.QLabel('Ascent Airspeed (m/s)')
-        AscR = QtGui.QLabel('Ascent Rate (m/s)')
-        EFTime = QtGui.QLabel('Time of Engine Failure (s)')
-        DescAS = QtGui.QLabel('Descent Airspeed (m/s)')
-        DescR = QtGui.QLabel('Descent Rate (m/s)')
-        WS = QtGui.QLabel('Wind Speed (m/s)')
-        WD = QtGui.QLabel('Wind Direction (degrees)')
-        AscX = QtGui.QLabel('Ascent DistanceX (m)')
-        AscY = QtGui.QLabel('Ascent Distance Y (m)')
-        DescX = QtGui.QLabel('Descent Distance X (m)')
-        DescY = QtGui.QLabel('Descent Distance Y (m)')        
-        WindX = QtGui.QLabel('Wind Distance X (m)')
-        WindY = QtGui.QLabel('Wind Distance Y (m)')
-        TotalX = QtGui.QLabel('Total Distance X (m)')
-        TotalY = QtGui.QLabel('Total Distance Y (m)')        
-        Ans = QtGui.QLabel('Location: Distance (m), Direction (Deg)')
 
-        self.TOLEdit = QtGui.QDoubleSpinBox()
-        self.HeadingEdit = QtGui.QDoubleSpinBox()
-        self.HeadingEdit.setRange(0, 360)
-        self.AscASEdit = QtGui.QDoubleSpinBox()
-        self.AscREdit = QtGui.QDoubleSpinBox()
-        self.EFTimeEdit = QtGui.QDoubleSpinBox()
-        self.EFTimeEdit.setRange(0, 1000)
-        self.DescASEdit = QtGui.QDoubleSpinBox()
-        self.DescREdit = QtGui.QDoubleSpinBox()
-        self.WSEdit = QtGui.QDoubleSpinBox()
-        self.WDEdit = QtGui.QDoubleSpinBox()
-        self.WDEdit.setRange(0, 360)
-        self.AscXDisp = QtGui.QDoubleSpinBox()              
-        self.AscXDisp.setRange(-10000, 10000)
-        self.AscYDisp = QtGui.QDoubleSpinBox()              
-        self.AscYDisp.setRange(-10000, 10000)
-        self.DescXDisp = QtGui.QDoubleSpinBox()              
-        self.DescXDisp.setRange(-10000, 10000)
-        self.DescYDisp = QtGui.QDoubleSpinBox()
-        self.DescYDisp.setRange(-10000, 10000)
-        self.WindXDisp = QtGui.QDoubleSpinBox()
-        self.WindXDisp.setRange(-10000, 10000)
-        self.WindYDisp = QtGui.QDoubleSpinBox()
-        self.WindYDisp.setRange(-10000, 10000)
-        self.TotalXDisp = QtGui.QDoubleSpinBox()
-        self.TotalXDisp.setRange(-10000, 10000)
-        self.TotalYDisp = QtGui.QDoubleSpinBox()
-        self.TotalYDisp.setRange(-10000, 10000)
-        self.AnsDisplay1 = QtGui.QDoubleSpinBox()
-        self.AnsDisplay1.setRange(-10000, 10000)
-        self.AnsDisplay2 = QtGui.QDoubleSpinBox()           
-        self.AnsDisplay2.setRange(0, 360)
+        calc_btn = QPushButton('Calculate')
+        calc_btn.clicked.connect(self.calculate)
+        quit = QPushButton('Quit')
+        quit.clicked.connect(QCoreApplication.instance().quit)
+    
+        blank = QLabel('')
+        tol_lbl = QLabel('Take-off Location')
+        heading_lbl = QLabel('Heading (degrees)')
+        asc_as_lbl = QLabel('Ascent Airspeed (m/s)')
+        asc_rate_lbl = QLabel('Ascent Rate (m/s)')
+        eng_fail_time_lbl = QLabel('Time of Engine Failure (s)')
+        desc_as_lbl = QLabel('Descent Airspeed (m/s)')
+        desc_rate_lbl = QLabel('Descent Rate (m/s)')
+        w_spd_lbl = QLabel('Wind Speed (m/s)')
+        w_direc_lbl = QLabel('Wind Blowing From (degrees)')
+        asc_dist_x_lbl = QLabel('Ascent Distance X (m)')
+        asc_dist_y_lbl = QLabel('Ascent Distance Y (m)')
+        desc_dist_x_lbl = QLabel('Descent Distance X (m)')
+        desc_dist_y_lbl = QLabel('Descent Distance Y (m)')        
+        wind_dist_x_lbl = QLabel('Wind Distance X (m)')
+        wind_dist_y_lbl = QLabel('Wind Distance Y (m)')
+        total_dist_x_lbl = QLabel('Total Distance X (m)')
+        total_dist_y_lbl = QLabel('Total Distance Y (m)')        
+        ans_distance_lbl = QLabel('Location: Distance (m)')
+        ans_angle_lbl = QLabel('Location: Direction (degrees)') # zero degrees is east , 90 degrees is north
+        ans_heading_lbl = QLabel('Location: Heading (degrees)') # zero degrees is north, 90 degrees is east
 
-        grid = QtGui.QGridLayout()
-        grid.setSpacing(10)
+        self.tol = QDoubleSpinBox()
+        self.heading = QDoubleSpinBox()
+        self.heading.setRange(0, 360)
+        self.asc_as = QDoubleSpinBox()
+        self.asc_rate = QDoubleSpinBox()
+        self.eng_fail_time = QDoubleSpinBox()
+        self.eng_fail_time.setRange(0, 1000)
+        self.desc_as = QDoubleSpinBox()
+        self.desc_rate = QDoubleSpinBox()
+        self.w_spd = QDoubleSpinBox()
+        self.w_dir = QDoubleSpinBox(); self.w_dir.setRange(0, 360)
+        self.asc_dist_x = QDoubleSpinBox(); self.asc_dist_x.setRange(-10000, 10000)
+        self.asc_dist_y = QDoubleSpinBox(); self.asc_dist_y.setRange(-10000, 10000)
+        self.desc_dist_x = QDoubleSpinBox(); self.desc_dist_x.setRange(-10000, 10000)
+        self.desc_dist_y = QDoubleSpinBox(); self.desc_dist_y.setRange(-10000, 10000)
+        self.wind_dist_x = QDoubleSpinBox(); self.wind_dist_x.setRange(-10000, 10000)
+        self.wind_dist_y = QDoubleSpinBox(); self.wind_dist_y.setRange(-10000, 10000)
+        self.total_dist_x = QDoubleSpinBox(); self.total_dist_x.setRange(-10000, 10000)
+        self.total_dist_y = QDoubleSpinBox(); self.total_dist_y.setRange(-10000, 10000)
+        self.ans_dist = QDoubleSpinBox(); self.ans_dist.setRange(-10000, 10000)
+        self.ans_angle = QDoubleSpinBox(); self.ans_angle.setRange(-360, 360)
+        self.ans_heading = QDoubleSpinBox(); self.ans_heading.setRange(-360, 360)
 
-        #grid.addWidget(TOL, 1, 0)
-        #grid.addWidget(self.TOLEdit, 1, 1)
+        grid = QGridLayout()
+        #grid.setSpacing(10)
 
-        grid.addWidget(Heading, 2, 0)
-        grid.addWidget(self.HeadingEdit, 2, 1)
-        grid.addWidget(AscAS, 3, 0)
-        grid.addWidget(self.AscASEdit, 3, 1)
-        grid.addWidget(AscR, 4, 0)
-        grid.addWidget(self.AscREdit, 4, 1)
-        grid.addWidget(EFTime, 5, 0)
-        grid.addWidget(self.EFTimeEdit, 5, 1)
-        grid.addWidget(DescAS, 6, 0)
-        grid.addWidget(self.DescASEdit, 6, 1)
-        grid.addWidget(DescR, 7, 0)
-        grid.addWidget(self.DescREdit, 7, 1)
-        #grid.addWidget(WS, 8, 0)
-        #grid.addWidget(self.WSEdit, 8, 1)
-        grid.addWidget(WD, 9, 0)
-        grid.addWidget(self.WDEdit, 9, 1)
-        grid.addWidget(CalcBtn, 10, 1)
+        grid.addWidget(heading_lbl, 2, 0)
+        grid.addWidget(self.heading, 2, 1)
+        grid.addWidget(asc_as_lbl, 3, 0)
+        grid.addWidget(self.asc_as, 3, 1)
+        grid.addWidget(asc_rate_lbl, 4, 0)
+        grid.addWidget(self.asc_rate, 4, 1)
+        grid.addWidget(eng_fail_time_lbl, 5, 0)
+        grid.addWidget(self.eng_fail_time, 5, 1)
+        grid.addWidget(desc_as_lbl, 6, 0)
+        grid.addWidget(self.desc_as, 6, 1)
+        grid.addWidget(desc_rate_lbl, 7, 0)
+        grid.addWidget(self.desc_rate, 7, 1)
+        #grid.addWidget(w_spd_lbl, 8, 0)
+        #grid.addWidget(self.w_spd, 8, 1)
+        grid.addWidget(w_direc_lbl, 9, 0)
+        grid.addWidget(self.w_dir, 9, 1)
+        grid.addWidget(calc_btn, 10, 1)
         grid.addWidget(blank, 11, 0)
-        grid.addWidget(AscX, 12, 0)        
-        grid.addWidget(self.AscXDisp, 12, 1)
-        grid.addWidget(AscY, 12, 2)
-        grid.addWidget(self.AscYDisp, 12, 3)        
-        grid.addWidget(DescX, 13, 0)
-        grid.addWidget(self.DescXDisp, 13, 1)
-        grid.addWidget(DescY, 13, 2)
-        grid.addWidget(self.DescYDisp, 13, 3)
-        grid.addWidget(WindX, 14, 0)
-        grid.addWidget(self.WindXDisp, 14, 1)
-        grid.addWidget(WindY, 14, 2)
-        grid.addWidget(self.WindYDisp, 14, 3)
-        grid.addWidget(TotalX, 15, 0)
-        grid.addWidget(self.TotalXDisp, 15, 1)
-        grid.addWidget(TotalY, 15, 2)        
-        grid.addWidget(self.TotalYDisp, 15, 3)        
+        grid.addWidget(asc_dist_x_lbl, 12, 0)        
+        grid.addWidget(self.asc_dist_x, 12, 1)
+        grid.addWidget(asc_dist_y_lbl, 12, 2)
+        grid.addWidget(self.asc_dist_y, 12, 3)        
+        grid.addWidget(desc_dist_x_lbl, 13, 0)
+        grid.addWidget(self.desc_dist_x, 13, 1)
+        grid.addWidget(desc_dist_y_lbl, 13, 2)
+        grid.addWidget(self.desc_dist_y, 13, 3)
+        grid.addWidget(wind_dist_x_lbl, 14, 0)
+        grid.addWidget(self.wind_dist_x, 14, 1)
+        grid.addWidget(wind_dist_y_lbl, 14, 2)
+        grid.addWidget(self.wind_dist_y, 14, 3)
+        grid.addWidget(total_dist_x_lbl, 15, 0)
+        grid.addWidget(self.total_dist_x, 15, 1)
+        grid.addWidget(total_dist_y_lbl, 15, 2)        
+        grid.addWidget(self.total_dist_y, 15, 3)        
         grid.addWidget(blank, 16, 0)
-        grid.addWidget(Ans, 17, 0)
-        grid.addWidget(self.AnsDisplay1, 17, 1)
-        grid.addWidget(self.AnsDisplay2, 17, 2)
-        grid.addWidget(Quit, 18, 3)
-        
-        self.setLayout(grid) 
-        self.setGeometry(300, 200, 700, 300)
-        self.setWindowTitle('Search Zone Location')    
+        grid.addWidget(ans_distance_lbl, 17, 0)
+        grid.addWidget(self.ans_dist, 17, 1)
+        grid.addWidget(ans_angle_lbl, 18, 0)
+        grid.addWidget(self.ans_angle, 18, 1)
+        grid.addWidget(ans_heading_lbl, 19, 0)
+        grid.addWidget(self.ans_heading, 19, 1)
+        grid.addWidget(quit, 20, 3)
+
+        self.setLayout(grid)    #Set the layout
+
+        self.setGeometry(10, 100, 600, 300)
+        self.setWindowTitle('Calculating Location of Aicraft Wreckage')
         self.show()
 
     def calculate(self):
-        at = self.EFTimeEdit.value()
-        h = self.HeadingEdit.value()
-        hrad = ((h/180)*math.pi)
-        aas = self.AscASEdit.value()
-        ar = self.AscREdit.value()
-        das = self.DescASEdit.value()
-        dr = self.DescREdit.value()
-        wd = self.WDEdit.value()
-        wdrad = (wd/180)*math.pi
-        height = (at*ar)
-        dt = (height/dr)
-        ax = (at*aas*math.sin(hrad))
-        ay = (at*aas*math.cos(hrad))
-        dx = (dt*das*math.sin(hrad))
-        dy = (dt*das*math.cos(hrad))
-        wd = -(-1/720)*dt**3 +25*dt             #incorrect equation, but is close to the correct value
-        wx = (wd*math.sin(wdrad))               #more information about wind distance will be released?
-        wy = (wd*math.cos(wdrad))
+        at = self.eng_fail_time.value()
+        h = 90 - self.heading.value()   #convert heading-->cartesian   
+        hrad = ((h/180)*math.pi)        #convert rad-->deg
+        aas = self.asc_as.value()        
+        ar = self.asc_rate.value()
+        das = self.desc_as.value()
+        dr = self.desc_rate.value()
+        wd = 270 - self.w_dir.value()   #convert wind origin-->cartesian
+        wdrad = ((wd/180)*math.pi)      #convert rad-->deg 
+        height = (at*ar)                #height reached
+        dt = (height/dr)                #descent time
+        ax = (at*aas*math.cos(hrad))
+        ay = (at*aas*math.sin(hrad))
+        dx = (dt*das*math.cos(hrad))
+        dy = (dt*das*math.sin(hrad))
+        wd = -(-1/720)*dt**3 +25*dt
+        '''
+        for wd equation, integrate equation given, then integrate expression 
+        between limits of time of engine failure (at) and total overall time (at+dt)
+        '''     
+        wx = (wd*math.cos(wdrad))
+        wy = (wd*math.sin(wdrad))
         totalx = (ax + dx + wx)
         totaly = (ay + dy + wy)
         dist = (math.sqrt(totalx**2 +totaly**2))
-        angle = ((math.atan(totaly/totalx))*180/math.pi)      #need to account for range of tan, if statements for the quadrants?
         
-        self.AscXDisp.setValue(ax)
-        self.AscYDisp.setValue(ay)
-        self.DescXDisp.setValue(dx)
-        self.DescYDisp.setValue(dy)
-        self.WindXDisp.setValue(wx)
-        self.WindYDisp.setValue(wy)
-        self.TotalXDisp.setValue(totalx)
-        self.TotalYDisp.setValue(totaly)
-        self.AnsDisplay1.setValue(dist)
-        self.AnsDisplay2.setValue(angle)        
+        if totaly>=0 and totalx>0:
+            angle = ((math.atan(totaly/totalx))*180/math.pi)
+        elif totaly<=0 and totalx>0:
+            angle = ((math.atan(totaly/totalx))*180/math.pi)
+        elif totaly>=0 and totalx<0:
+            angle = ((math.atan(totaly/totalx))*180/math.pi +180)
+        elif totaly<=0 and totalx<0:
+            angle = ((math.atan(totaly/totalx))*180/math.pi + 180)
+        elif totaly==0 and totalx==0:
+            angle = 0
+        elif totaly<0 and totalx==0:
+            angle = 270
+        elif totaly>0 and totalx==0:
+            angle = 90            
         
+        self.asc_dist_x.setValue(ax)
+        self.asc_dist_y.setValue(ay)
+        self.desc_dist_x.setValue(dx)
+        self.desc_dist_y.setValue(dy)
+        self.wind_dist_x.setValue(wx)
+        self.wind_dist_y.setValue(wy)
+        self.total_dist_x.setValue(totalx)
+        self.total_dist_y.setValue(totaly)
+        self.ans_dist.setValue(dist)
+        self.ans_angle.setValue(angle)
+        self.ans_heading.setValue(90 - angle)
+        
+
+    #def close_app(self):
+        #print("Closing")
+        #sys.exit()
+
 def main():
-    
-    app = QtGui.QApplication(sys.argv)
-    ex = Example()
+
+    ex = Gui()
     sys.exit(app.exec_())
 
 

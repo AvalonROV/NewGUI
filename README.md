@@ -22,9 +22,3 @@ source
 
 single_camerafeed_display
 - using openCV to display camerafeed from the laptop webcam
-
-test
-- GUI for plotting OBS data, not in correct format for integrating
-
-testscript
-- code for plotting OBS data in a GUI, direct copy of code from the internet

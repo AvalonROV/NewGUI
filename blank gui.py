@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import cv2
 import sys
-import numpy as np
-import matplotlib as mpl
 from PyQt4.QtGui import*
 from PyQt4.QtCore import *
 
