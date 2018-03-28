@@ -40,7 +40,8 @@ class Gui(QWidget):
         water_vel_lbl = QLabel('Velocity of Water (knots)')
         efficiency_lbl = QLabel('Efficiency of Turbines (%)')
         ans_lbl = QLabel('Answer - Maximum Power Generated (W)')
-        
+        power_url_lbl = QLabel('DeepZoom Link:')
+        power_url = QLineEdit('http://www.deepzoom.com')
         
         #self.power = QDoubleSpinBox()
         self.num_tb = QDoubleSpinBox(); self.num_tb.setRange(0, 30)
@@ -68,9 +69,12 @@ class Gui(QWidget):
         grid.addWidget(self.efficiency, 5, 2)
         grid.addWidget(CalcBtn, 6, 2)
         grid.addWidget(self.ans, 7, 2)
+        grid.addWidget(blank, 8, 1)
+        grid.addWidget(power_url_lbl, 9, 1)
+        grid.addWidget(power_url, 9, 2)
         self.setLayout(grid)    #Set the layout
-        grid.setSpacing(20)
-        self.setGeometry(10, 100, 600, 260)
+        grid.setSpacing(14)
+        self.setGeometry(10, 100, 400, 300)
         self.setWindowTitle('Calculating Power Generated')    
         self.show()
 
@@ -82,7 +86,7 @@ class Gui(QWidget):
         a = (d/2)**2 * math.pi
         V = self.water_vel.value()  #either 463/900 or 33/64
         Cp = self.efficiency.value()
-        pwr= N/2 * p * a * (V*463/900)**3 * Cp/100
+        pwr = N/2 * p * a * (V*463/900)**3 * Cp/100
         self.ans.setValue(pwr)
 
     #def close_app(self):

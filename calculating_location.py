@@ -21,8 +21,8 @@ class Gui(QWidget):
 
     def initUI(self):
 
-        calc_btn = QPushButton('Calculate')
-        calc_btn.clicked.connect(self.calculate)
+        calc_btn_loc = QPushButton('Calculate Location')
+        calc_btn_loc.clicked.connect(self.calculate_loc)
         quit = QPushButton('Quit')
         quit.clicked.connect(QCoreApplication.instance().quit)
     
@@ -36,6 +36,7 @@ class Gui(QWidget):
         desc_rate_lbl = QLabel('Descent Rate (m/s)')
         w_spd_lbl = QLabel('Wind Speed (m/s)')
         w_direc_lbl = QLabel('Wind Blowing From (degrees)')
+        w_eqn_lbl = QLabel('Wind Direction Equation')
         asc_dist_x_lbl = QLabel('Ascent Distance X (m)')
         asc_dist_y_lbl = QLabel('Ascent Distance Y (m)')
         desc_dist_x_lbl = QLabel('Descent Distance X (m)')
@@ -59,6 +60,7 @@ class Gui(QWidget):
         self.desc_rate = QDoubleSpinBox()
         self.w_spd = QDoubleSpinBox()
         self.w_dir = QDoubleSpinBox(); self.w_dir.setRange(0, 360)
+        self.w_eqn = QLineEdit(); self.w_eqn.setText('-(t/720)**2 + 25')
         self.asc_dist_x = QDoubleSpinBox(); self.asc_dist_x.setRange(-10000, 10000)
         self.asc_dist_y = QDoubleSpinBox(); self.asc_dist_y.setRange(-10000, 10000)
         self.desc_dist_x = QDoubleSpinBox(); self.desc_dist_x.setRange(-10000, 10000)
@@ -86,12 +88,12 @@ class Gui(QWidget):
         grid.addWidget(self.desc_as, 6, 1)
         grid.addWidget(desc_rate_lbl, 7, 0)
         grid.addWidget(self.desc_rate, 7, 1)
-        #grid.addWidget(w_spd_lbl, 8, 0)
-        #grid.addWidget(self.w_spd, 8, 1)
         grid.addWidget(w_direc_lbl, 9, 0)
         grid.addWidget(self.w_dir, 9, 1)
-        grid.addWidget(calc_btn, 10, 1)
-        grid.addWidget(blank, 11, 0)
+        grid.addWidget(w_eqn_lbl, 10, 0)
+        grid.addWidget(self.w_eqn, 10, 1)
+        grid.addWidget(calc_btn_loc, 11, 1)
+        #grid.addWidget(blank, 11, 0)
         grid.addWidget(asc_dist_x_lbl, 12, 0)        
         grid.addWidget(self.asc_dist_x, 12, 1)
         grid.addWidget(asc_dist_y_lbl, 12, 2)
@@ -123,7 +125,7 @@ class Gui(QWidget):
         self.setWindowTitle('Calculating Location of Aicraft Wreckage')
         self.show()
 
-    def calculate(self):
+    def calculate_loc(self):
         at = self.eng_fail_time.value()
         h = 90 - self.heading.value()   #convert heading-->cartesian   
         hrad = ((h/180)*math.pi)        #convert rad-->deg
@@ -134,16 +136,16 @@ class Gui(QWidget):
         wd = 270 - self.w_dir.value()   #convert wind origin-->cartesian
         wdrad = ((wd/180)*math.pi)      #convert rad-->deg 
         height = (at*ar)                #height reached
-        dt = (height/dr)                #descent time
+        dt = (height/(dr))                #descent time
+        eqn = str(self.w_eqn.text())
         ax = (at*aas*math.cos(hrad))
         ay = (at*aas*math.sin(hrad))
         dx = (dt*das*math.cos(hrad))
-        dy = (dt*das*math.sin(hrad))
-        wd = -(-1/720)*dt**3 +25*dt
-        '''
-        for wd equation, integrate equation given, then integrate expression 
-        between limits of time of engine failure (at) and total overall time (at+dt)
-        '''     
+        dy = (dt*das*math.sin(hrad))   
+        def integrand(t):
+            return eval(eqn)
+            #return -(t/720)**2 + 25
+        wd, err = quad(integrand, at, at+dt)
         wx = (wd*math.cos(wdrad))
         wy = (wd*math.sin(wdrad))
         totalx = (ax + dx + wx)
@@ -175,8 +177,7 @@ class Gui(QWidget):
         self.total_dist_y.setValue(totaly)
         self.ans_dist.setValue(dist)
         self.ans_angle.setValue(angle)
-        self.ans_heading.setValue(90 - angle)
-        
+        self.ans_heading.setValue(90 - angle)        
 
     #def close_app(self):
         #print("Closing")

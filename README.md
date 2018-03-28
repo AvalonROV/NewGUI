@@ -12,10 +12,17 @@ that different GUIs can be integrated with each other easily
 calculating_location
 - GUI for calculating the location of the aircraft wreck
 
+calculating_location
+- GUI for calculating the max power possible to be generated
+
+copilot_gui
+- includes OBS graph, IMU and depth readings, flight location data calculation,
+power calculation, web address for deepzoom
+
 graphing
 - GUI for plotting OBS data from the wifi connection
 
-pilot_layout_2018
+pilot_gui
 - includes two camerafeed displays, two sliders to select camerafeed source, 
 indicators for inflating and detatching lifting bag and dropping inductive power
 source
