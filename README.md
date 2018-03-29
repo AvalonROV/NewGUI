@@ -27,5 +27,8 @@ pilot_gui
 indicators for inflating and detatching lifting bag and dropping inductive power
 source
 
+pilot_gui_addingPC
+- same as pilot_gui but with working button for dropping inductive power circuit
+
 single_camerafeed_display
 - using openCV to display camerafeed from the laptop webcam

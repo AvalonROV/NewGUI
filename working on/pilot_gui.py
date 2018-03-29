@@ -56,7 +56,7 @@ class Gui(QWidget):
 
         #video 
         self.video1 = Video(cv2.VideoCapture(0))        #an object of class Video(argument)
-        self.video2 = Video(cv2.VideoCapture(0))        #edit integer to change feed source
+        self.video2 = Video(cv2.VideoCapture(0))        #edit integer to change feed source, 0 is webcam, 1 is videograbber
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.play1)
         self._timer.timeout.connect(self.play2)
@@ -98,22 +98,21 @@ class Gui(QWidget):
         self.video_frame2.setMaximumSize(8*70, 6*70)
         
         
-        #self.quit_button = QPushButton('Quit')
-        #self.quit_button.clicked.connect(self.close_app)
-        self.icon1 = colour_box1("255, 0, 0")           #r, g, b
-        self.icon2 = colour_box2("255, 0, 0")
-        self.icon3 = colour_box3("255, 0, 0")
+        self.icon1 = colour_box("255, 0, 0")           #format is ("r, g, b")
+        self.icon2 = colour_box("255, 0, 0")
+        self.icon3 = colour_box("255, 0, 0")
         self.indicator1 = QLabel('Inflating lifting bag')
         self.indicator2 = QLabel('Detatching lifting bag')
         self.indicator3 = QLabel('Dropping power circuit')
         self.indicator4 = QLabel('Depth reading')
 
         self.cam_slider1 = QSlider()
-        self.cam_slider1.setRange(0, 6)
-        self.cam_slider1.setTickPosition(3)
+        self.cam_slider1.setRange(0, 5)
+        self.cam_slider1.setTickPosition(3) #sets tick position to either side of the slider
         self.cam_slider2 = QSlider()
-        self.cam_slider2.setRange(0, 6)
+        self.cam_slider2.setRange(0, 5)
         self.cam_slider2.setTickPosition(3)
+        self.depth_reading = QLineEdit()
 
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
@@ -139,19 +138,13 @@ class Gui(QWidget):
         grid.addWidget(self.icon1, 6, 2)
         grid.addWidget(self.icon2, 7, 2)
         grid.addWidget(self.icon3, 8, 2)
+        grid.addWidget(self.depth_reading, 9, 2)
 
-        #grid.addWidget(self.quit_button, 10, 1)
-        
-        
         self.setLayout(grid)    #Set the layout
         
         self.setGeometry(10, 100, 600, 300)
         self.setWindowTitle('Pilot GUI')    
         self.show()
-
-    #def close_app(self):
-        #print("Closing")
-        #sys.exit()
 
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
@@ -176,7 +169,7 @@ class Gui(QWidget):
         2 -> anti-clockwise/closing
 
         LED1: On-baord LED
-        LED2: On-baord LED
+        LED2: On-board LED
         0 -> OFF
         1 -> ON
 
@@ -310,7 +303,7 @@ class Gui(QWidget):
         self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
                                  self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
                                  self.arm, self.funnel, self.BT_button1, LED2, self.BT])
-        print(self.stringToSend) # Print final string
+        #print(self.stringToSend) # Print final string
 
     def information(self):
         """
@@ -360,31 +353,13 @@ class Video():
             return None
 #---------------- end of video class
 
-class colour_box1(QLabel):
+class colour_box(QLabel):
     #Constructor
     def __init__(self, box_colour):
-        super(colour_box1, self).__init__()
+        super(colour_box, self).__init__()
         self.setStyleSheet("background-color: rgb(" + box_colour + ")")
     
-    def change_colour(self, box_colour):
-        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
-
-class colour_box2(QLabel):
-    #Constructor
-    def __init__(self, box_colour):
-        super(colour_box2, self).__init__()
-        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
-    
-    def change_colour(self, box_colour):
-        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
-
-class colour_box3(QLabel):
-    #Constructor
-    def __init__(self, box_colour):
-        super(colour_box3, self).__init__()
-        self.setStyleSheet("background-color: rgb(" + box_colour + ")")
-    
-    def change_colour(self, box_colour):
+    def change_colour(self, box_colour):    #changes colour of QLabel to whatever colour is set using RGB format
         self.setStyleSheet("background-color: rgb(" + box_colour + ")")
 #---------------- end of colour_box classes for LED indicators
 
