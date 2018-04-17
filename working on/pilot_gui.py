@@ -28,12 +28,14 @@ my_joystick.init()  # Initialise the Joystick
 clock = pygame.time.Clock() # Create a clock object to track time
 
 app = QApplication(sys.argv) # Creat a new QApplication object. This manages
-                             # the GUI application's control flow and main
-                             # settings.
+                                # the GUI application's control flow and main
+                                # settings.
 
 # Global variables defining the ROV LEDs status
-LED1 = 0
-LED2 = 0
+LB1 = 0
+LB2 = 0
+DPC = 0
+DB1 = 0
 
 
 class Gui(QWidget):
@@ -42,7 +44,7 @@ class Gui(QWidget):
     """
     def __init__(self):
         super(Gui, self).__init__()
-        
+
         self.initUI()
         self.string_formatter()
         # ------THREADING-----#
@@ -51,7 +53,7 @@ class Gui(QWidget):
         """
         self.thread = Worker()  #Define a thread object
         self.connect(self.thread, SIGNAL('Hello'), self.information) # Connect the incoming signal from the
-                                                                     # thread to the 'information' function
+                                                                        # thread to the 'information' function
         self.thread.start() #Start the thread
 
         #video 
@@ -62,7 +64,7 @@ class Gui(QWidget):
         self._timer.timeout.connect(self.play2)
         self._timer.start(27)
         self.update()
-        
+
     def play1(self):
         try:
             self.video1.captureNextFrame()
@@ -71,7 +73,7 @@ class Gui(QWidget):
             self.video_frame1.setScaledContents(True)
         except TypeError:
             print("No frame")
-            
+
     def play2(self):
         try:
             self.video2.captureNextFrame()
@@ -96,11 +98,12 @@ class Gui(QWidget):
         self.video_frame2 = QLabel()
         self.video_frame1.setMaximumSize(8*70, 6*70)          #640, 480; 8:6
         self.video_frame2.setMaximumSize(8*70, 6*70)
-        
-        
+
+
         self.icon1 = colour_box("255, 0, 0")           #format is ("r, g, b")
         self.icon2 = colour_box("255, 0, 0")
         self.icon3 = colour_box("255, 0, 0")
+        self.icon4 = colour_box("255, 0, 0")
         self.indicator1 = QLabel('Inflating lifting bag')
         self.indicator2 = QLabel('Detatching lifting bag')
         self.indicator3 = QLabel('Dropping power circuit')
@@ -138,10 +141,11 @@ class Gui(QWidget):
         grid.addWidget(self.icon1, 6, 2)
         grid.addWidget(self.icon2, 7, 2)
         grid.addWidget(self.icon3, 8, 2)
-        grid.addWidget(self.depth_reading, 9, 2)
+        grid.addWidget(self.icon4, 9, 2)        
+        grid.addWidget(self.depth_reading, 10, 2)
 
         self.setLayout(grid)    #Set the layout
-        
+
         self.setGeometry(10, 100, 600, 300)
         self.setWindowTitle('Pilot GUI')    
         self.show()
@@ -152,7 +156,7 @@ class Gui(QWidget):
         This function formats the string that will be sent to the ROV containg the
         commands.
 
-        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LED1, LED2, BT]
+        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, LB2, DPC, BT]
 
         FL: Forward Left Thruster 
         FU: Forward Up Thruster
@@ -168,8 +172,13 @@ class Gui(QWidget):
         1 -> clockwise/opening
         2 -> anti-clockwise/closing
 
-        LED1: On-baord LED
-        LED2: On-board LED
+        LB1: On-baord LED
+        LB2: On-board LED
+        DPC: power circuit dropped indicator
+        LB1: lifring bag 1
+        LB2: lifring bag 2
+        DB1: drop bag 1
+        
         0 -> OFF
         1 -> ON
 
@@ -182,12 +191,14 @@ class Gui(QWidget):
         self.Throttle = my_joystick.get_axis(2)
         self.Yaw = my_joystick.get_axis(3)
         self.Rudder = my_joystick.get_axis(4)
-        self.funnel_CW_button = my_joystick.get_button(4)  # Button 5
-        self.funnel_CCW_button = my_joystick.get_button(5)  # Button 6
-        self.arm_open_button = my_joystick.get_button(6)  # Button 7
-        self.arm_close_button = my_joystick.get_button(7)  # Button 8
-        self.LED1_button = my_joystick.get_button(10)  # Button SE
-        self.LED2_button = my_joystick.get_button(11)  # Button ST
+        self.button5 = my_joystick.get_button(4)  # Button 5
+        self.button6 = my_joystick.get_button(5)  # Button 6
+        self.button7 = my_joystick.get_button(6)  # Button 7
+        self.DPC_button = my_joystick.get_button(7)  # Button 8
+        self.LB1_button = my_joystick.get_button(10)  # Button SE
+        self.LB2_button = my_joystick.get_button(11)  # Button ST
+        self.button4 = my_joystick.get_button(3)  # Button 4, L3
+
 
         # Bluetooth controls
         self.BT_button1 = my_joystick.get_button(0)
@@ -197,8 +208,12 @@ class Gui(QWidget):
         self.BT = 0
         self.funnel = 0
         self.arm = 0
-        global LED1
-        global LED2
+        global LB1
+        global LB2
+        global DPC
+        global LB1
+        global LB2
+        global DB2
 
         # ================================ Thrusters Power ================================
         """
@@ -226,7 +241,7 @@ class Gui(QWidget):
 
         # Account for double power in case of diagonals
         if ((self.X_Axis > 0.1 and self.Y_Axis < -0.1) or
-                (self.X_Axis < -0.1 and self.Y_Axis > 0.1) or
+            (self.X_Axis < -0.1 and self.Y_Axis > 0.1) or
                 (self.X_Axis < -0.1 and self.Y_Axis < -0.1) or
                 (self.X_Axis > 0.1 and self.Y_Axis > 0.1)):
             self.fwd_factor = 200 * self.power      # multiply by half of the power factor
@@ -258,40 +273,66 @@ class Gui(QWidget):
 
         # ================================ Manipulators ================================
         # Funnel
-        if (self.funnel_CW_button == 1):
+        if (self.button5 == 1):
             self.funnel = 1
-        elif (self.funnel_CCW_button == 1):
+        elif (self.button6 == 1):
             self.funnel = 2
 
         # Arm
-        if (self.arm_open_button == 1):
+        if (self.button7 == 1):
             self.arm = 1
-        elif (self.arm_close_button == 1):
+        elif (self.button8 == 1):
             self.arm = 2
 
-        # LED1
-        if (self.LED1_button == 1):
+        # LB1
+        if (self.LB1_button == 1):
             sleep(0.2)
-            if (LED1 == 1):
-                LED1 = 0
+            if (LB1 == 1):
+                LB1 = 0
                 self.icon1.change_colour("0, 255, 0")
                 #self.led1_indicator.setPixmap(self.red_circle_indicator)
             else:
-                LED1 = 1
+                LB1 = 1
                 self.icon1.change_colour("0, 255, 0")
                 #self.led1_indicator.setPixmap(self.green_circle_indicator)
 
-        # LED2
-        if (self.LED2_button == 1):
+        # LB2
+        if (self.LB2_button == 1):
             sleep(0.2)
-            if (LED2 == 1):
-                LED2 = 0
+            if (LB2 == 1):
+                LB2 = 0
                 self.icon2.change_colour("255, 0, 0")
                 #self.led2_indicator.setPixmap(self.red_circle_indicator)
             else:
-                LED2 = 1
+                LB2 = 1
                 self.icon2.change_colour("0, 255, 0")
                 #self.led2_indicator.setPixmap(self.green_circle_indicator)
+
+        # DPC
+        if (self.DPC_button == 1):
+            sleep(0.2)
+            if (DPC == 1):
+                DPC = 0
+                self.icon3.change_colour("255, 0, 0")
+                #self.led2_indicator.setPixmap(self.red_circle_indicator)
+            else:
+                DPC = 1
+                self.icon3.change_colour("0, 255, 0")
+                #self.led2_indicator.setPixmap(self.green_circle_indicator)
+                
+        # DB1
+        if (self.DB1_button == 1):
+            sleep(0.2)
+            if (DB1 == 1):
+                DB1 = 0
+                self.icon4.change_colour("255, 0, 0")
+                #self.led2_indicator.setPixmap(self.red_circle_indicator)
+            else:
+                DB1 = 1
+                self.icon4.change_colour("0, 255, 0")
+                #self.led2_indicator.setPixmap(self.green_circle_indicator)
+
+
 
         # Bluetooth
         if(self.BT_button1 == 1):
@@ -302,7 +343,7 @@ class Gui(QWidget):
         # Final string to be sent
         self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
                                  self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
-                                 self.arm, self.funnel, self.BT_button1, LED2, self.BT])
+                                 self.arm, self.funnel, self.BT_button1, LB1, LB2, DPC, self.BT])
         #print(self.stringToSend) # Print final string
 
     def information(self):
@@ -344,7 +385,7 @@ class Video():
             height,width=self.currentFrame.shape[:2]
             img=QImage(self.currentFrame,
                        width,
-                              height,
+                       height,
                               QImage.Format_RGB888)
             img=QPixmap.fromImage(img)
             self.previousFrame = self.currentFrame
@@ -358,7 +399,7 @@ class colour_box(QLabel):
     def __init__(self, box_colour):
         super(colour_box, self).__init__()
         self.setStyleSheet("background-color: rgb(" + box_colour + ")")
-    
+
     def change_colour(self, box_colour):    #changes colour of QLabel to whatever colour is set using RGB format
         self.setStyleSheet("background-color: rgb(" + box_colour + ")")
 #---------------- end of colour_box classes for LED indicators
@@ -387,7 +428,7 @@ class Worker(QThread):
         quit()
 
 def main():
-    
+
     ex = Gui()
     sys.exit(app.exec_())
 
