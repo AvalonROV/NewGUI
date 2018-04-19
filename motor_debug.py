@@ -213,12 +213,17 @@ class Gui(QWidget):
         self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
                             self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
         
-        self.stringToSend = [self.stringInitial[i] for i in self.stringOrder]
+        self.stringThing = [self.stringInitial[i] for i in self.stringOrder]
         self.stringName = [self.stringName[i] for i in self.stringOrder]
-        self.stringToDisplay = (str(self.stringToSend) + '\n\n' + str(self.stringName))
+        self.stringToSend = (str(self.stringThing) + '\n\n' + str(self.stringName))
         print(self.stringToSend)
-        self.str_disp.setText(self.stringToDisplay)
-        
+        self.str_disp.setText(self.stringToSend)
+        '''
+        # Final string to be sent
+        self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
+                                 self.bck_right_thruster, self.back_thruster, self.bck_left_thruster])
+        print(self.stringToSend) # Print final string    
+        '''
 
 def main():
 

@@ -176,7 +176,7 @@ class Gui(QWidget):
         hbox.addLayout(loc_calc)
         self.setLayout(hbox)    #Set the layout
 
-        self.setGeometry(10, 100, 1200, 600)
+        self.setGeometry(10, 100, 1600, 600)
         self.setWindowTitle('Co-pilot GUI')    
         self.show()
 
