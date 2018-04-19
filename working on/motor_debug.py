@@ -13,7 +13,7 @@ class Gui(QWidget):
 
     def __init__(self):
         super(Gui, self).__init__()
-        self.initUI()
+        self.initUI()                        
 
     def initUI(self):
         
@@ -22,7 +22,7 @@ class Gui(QWidget):
         name_lbl = QLabel('Name'); name_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         val_lbl = QLabel('Thrust value'); val_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         btn_lbl = QLabel('Flip direction?'); btn_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
-        fval_lbl = QLabel('Flip val (-1=y, 1=n)'); btn_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
+        fval_lbl = QLabel('Flip Value:'); fval_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         order_lbl = QLabel('Order in string'); order_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         
         m1_lbl = QLabel('Forward Left Motor')
@@ -32,36 +32,36 @@ class Gui(QWidget):
         m5_lbl = QLabel('Front Motor')
         m6_lbl = QLabel('Back Motor')
 
-        m1_mag = QSpinBox(); m1_mag.setRange(1100, 1900); m1_mag.setValue(1500)
-        m2_mag = QSpinBox(); m2_mag.setRange(1100, 1900); m2_mag.setValue(1500)
-        m3_mag = QSpinBox(); m3_mag.setRange(1100, 1900); m3_mag.setValue(1500)
-        m4_mag = QSpinBox(); m4_mag.setRange(1100, 1900); m4_mag.setValue(1500)
-        m5_mag = QSpinBox(); m5_mag.setRange(1100, 1900); m5_mag.setValue(1500)
-        m6_mag = QSpinBox(); m6_mag.setRange(1100, 1900); m6_mag.setValue(1500)
+        self.m1_mag = QSpinBox(); self.m1_mag.setRange(-400, 400); self.m1_mag.setValue(0); self.m1_mag.valueChanged.connect(self.stringcode)
+        self.m2_mag = QSpinBox(); self.m2_mag.setRange(-400, 400); self.m2_mag.setValue(0); self.m2_mag.valueChanged.connect(self.stringcode)
+        self.m3_mag = QSpinBox(); self.m3_mag.setRange(-400, 400); self.m3_mag.setValue(0); self.m3_mag.valueChanged.connect(self.stringcode)
+        self.m4_mag = QSpinBox(); self.m4_mag.setRange(-400, 400); self.m4_mag.setValue(0); self.m4_mag.valueChanged.connect(self.stringcode)
+        self.m5_mag = QSpinBox(); self.m5_mag.setRange(-400, 400); self.m5_mag.setValue(0); self.m5_mag.valueChanged.connect(self.stringcode)
+        self.m6_mag = QSpinBox(); self.m6_mag.setRange(-400, 400); self.m6_mag.setValue(0); self.m6_mag.valueChanged.connect(self.stringcode)
 
-        m1_btn = QPushButton('Flip Direction'); m1_btn.clicked.connect(self.flip)
-        m2_btn = QPushButton('Flip Direction'); m2_btn.clicked.connect(self.flip)
-        m3_btn = QPushButton('Flip Direction'); m3_btn.clicked.connect(self.flip)
-        m4_btn = QPushButton('Flip Direction'); m4_btn.clicked.connect(self.flip)
-        m5_btn = QPushButton('Flip Direction'); m5_btn.clicked.connect(self.flip)
-        m6_btn = QPushButton('Flip Direction'); m6_btn.clicked.connect(self.flip)
+        m1_btn = QPushButton('Flip Direction'); m1_btn.clicked.connect(self.flipflt)
+        m2_btn = QPushButton('Flip Direction'); m2_btn.clicked.connect(self.flipfrt)
+        m3_btn = QPushButton('Flip Direction'); m3_btn.clicked.connect(self.flipblt)
+        m4_btn = QPushButton('Flip Direction'); m4_btn.clicked.connect(self.flipbrt)
+        m5_btn = QPushButton('Flip Direction'); m5_btn.clicked.connect(self.flipft)
+        m6_btn = QPushButton('Flip Direction'); m6_btn.clicked.connect(self.flipbt)
         
-        m1_val = QSpinBox(); m1_val.setValue(1); m1_val.setRange(-1, 1); m1_val.setSingleStep(2)
-        m2_val = QSpinBox(); m2_val.setValue(1); m2_val.setRange(-1, 1); m2_val.setSingleStep(2)
-        m3_val = QSpinBox(); m3_val.setValue(1); m3_val.setRange(-1, 1); m3_val.setSingleStep(2)
-        m4_val = QSpinBox(); m4_val.setValue(1); m4_val.setRange(-1, 1); m4_val.setSingleStep(2)
-        m5_val = QSpinBox(); m5_val.setValue(1); m5_val.setRange(-1, 1); m5_val.setSingleStep(2)
-        m6_val = QSpinBox(); m6_val.setValue(1); m6_val.setRange(-1, 1); m6_val.setSingleStep(2)
+        self.m1_val = QSpinBox(); self.m1_val.setValue(1); self.m1_val.setRange(-1, 1)
+        self.m2_val = QSpinBox(); self.m2_val.setValue(1); self.m2_val.setRange(-1, 1)
+        self.m3_val = QSpinBox(); self.m3_val.setValue(1); self.m3_val.setRange(-1, 1)
+        self.m4_val = QSpinBox(); self.m4_val.setValue(1); self.m4_val.setRange(-1, 1)
+        self.m5_val = QSpinBox(); self.m5_val.setValue(1); self.m5_val.setRange(-1, 1)
+        self.m6_val = QSpinBox(); self.m6_val.setValue(1); self.m6_val.setRange(-1, 1)
 
-        m1_num = QSpinBox(); m1_num.setRange(1, 6); m1_num.setValue(1)
-        m2_num = QSpinBox(); m2_num.setRange(1, 6); m2_num.setValue(2)
-        m3_num = QSpinBox(); m3_num.setRange(1, 6); m3_num.setValue(3)
-        m4_num = QSpinBox(); m4_num.setRange(1, 6); m4_num.setValue(4)
-        m5_num = QSpinBox(); m5_num.setRange(1, 6); m5_num.setValue(5)
-        m6_num = QSpinBox(); m6_num.setRange(1, 6); m6_num.setValue(6)
+        self.m1_num = QSpinBox(); self.m1_num.setRange(1, 6); self.m1_num.setValue(1)
+        self.m2_num = QSpinBox(); self.m2_num.setRange(1, 6); self.m2_num.setValue(2)
+        self.m3_num = QSpinBox(); self.m3_num.setRange(1, 6); self.m3_num.setValue(3)
+        self.m4_num = QSpinBox(); self.m4_num.setRange(1, 6); self.m4_num.setValue(4)
+        self.m5_num = QSpinBox(); self.m5_num.setRange(1, 6); self.m5_num.setValue(5)
+        self.m6_num = QSpinBox(); self.m6_num.setRange(1, 6); self.m6_num.setValue(6)
         
-        str_disp = QLineEdit('')
-        str_disp_btn = QPushButton('Display String to Motor'); str_disp_btn.clicked.connect(self.stringedit)
+        self.str_disp = QTextEdit('blank')
+        str_disp_btn = QPushButton('Display String Order'); str_disp_btn.clicked.connect(self.stringcode)
         
         grid = QGridLayout()              #Create layout container
         
@@ -72,65 +72,88 @@ class Gui(QWidget):
         grid.addWidget(order_lbl, 1, 5)
         
         grid.addWidget(m1_lbl, 2, 1)
-        grid.addWidget(m1_mag, 2, 2)
+        grid.addWidget(self.m1_mag, 2, 2)
         grid.addWidget(m1_btn, 2, 3)
-        grid.addWidget(m1_val, 2, 4)
-        grid.addWidget(m1_num, 2, 5)
+        grid.addWidget(self.m1_val, 2, 4)
+        grid.addWidget(self.m1_num, 2, 5)
         
         grid.addWidget(m2_lbl, 3, 1)
-        grid.addWidget(m2_mag, 3, 2)
+        grid.addWidget(self.m2_mag, 3, 2)
         grid.addWidget(m2_btn, 3, 3)
-        grid.addWidget(m2_val, 3, 4)
-        grid.addWidget(m2_num, 3, 5)
+        grid.addWidget(self.m2_val, 3, 4)
+        grid.addWidget(self.m2_num, 3, 5)
         
         grid.addWidget(m3_lbl, 4, 1)
-        grid.addWidget(m3_mag, 4, 2)
+        grid.addWidget(self.m3_mag, 4, 2)
         grid.addWidget(m3_btn, 4, 3)
-        grid.addWidget(m3_val, 4, 4)
-        grid.addWidget(m3_num, 4, 5)
+        grid.addWidget(self.m3_val, 4, 4)
+        grid.addWidget(self.m3_num, 4, 5)
         
         grid.addWidget(m4_lbl, 5, 1)
-        grid.addWidget(m4_mag, 5, 2)
+        grid.addWidget(self.m4_mag, 5, 2)
         grid.addWidget(m4_btn, 5, 3)
-        grid.addWidget(m4_val, 5, 4)
-        grid.addWidget(m4_num, 5, 5)
+        grid.addWidget(self.m4_val, 5, 4)
+        grid.addWidget(self.m4_num, 5, 5)
         
         grid.addWidget(m5_lbl, 6, 1)
-        grid.addWidget(m5_mag, 6, 2)
+        grid.addWidget(self.m5_mag, 6, 2)
         grid.addWidget(m5_btn, 6, 3)
-        grid.addWidget(m5_val, 6, 4)
-        grid.addWidget(m5_num, 6, 5)
+        grid.addWidget(self.m5_val, 6, 4)
+        grid.addWidget(self.m5_num, 6, 5)
         
         grid.addWidget(m6_lbl, 7, 1)
-        grid.addWidget(m6_mag, 7, 2)
+        grid.addWidget(self.m6_mag, 7, 2)
         grid.addWidget(m6_btn, 7, 3)
-        grid.addWidget(m6_val, 7, 4)
-        grid.addWidget(m6_num, 7, 5)        
+        grid.addWidget(self.m6_val, 7, 4)
+        grid.addWidget(self.m6_num, 7, 5)       
+        
+        grid.addWidget(str_disp_btn, 9, 1)
+        grid.addWidget(self.str_disp, 9, 2, 1, 4)
         
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 100, 600, 300)
         self.setWindowTitle('Debug Motors')    
-        self.show()
+        self.show()    
+        
+    def flipflt(self):   #flip motor direction 
+        if (self.m1_val.value() == 1):
+            self.m1_val.setValue(-1)
+        elif (self.m1_val.value() == -1):
+            self.m1_val.setValue(1)
+            
+    def flipfrt(self):   #flip motor direction 
+        if (self.m2_val.value() == 1):
+            self.m2_val.setValue(-1)
+        elif (self.m2_val.value() == -1):
+            self.m2_val.setValue(1)
 
-        self.fwd_left_thruster = m1_mag.value()
-        self.fwd_right_thruster = m2_mag.value()
-        self.bck_left_thruster = m3_mag.value()
-        self.bck_right_thruster = m4_mag.value()
-        self.front_thruster = m5_mag.value()
-        self.back_thruster = m6_mag.value()        
+    def flipblt(self):   #flip motor direction 
+        if (self.m3_val.value() == 1):
+            self.m3_val.setValue(-1)
+        elif (self.m3_val.value() == -1):
+            self.m3_val.setValue(1)
+        
+    def flipbrt(self):   #flip motor direction 
+        if (self.m4_val.value() == 1):
+            self.m4_val.setValue(-1)
+        elif (self.m4_val.value() == -1):
+            self.m4_val.setValue(1)
 
-    def flip(self):
-        (self.fwd_left_thruster)
-        #flip motor direction
-        pass
+    def flipft(self):    #flip motor direction 
+        if (self.m5_val.value() == 1):
+            self.m5_val.setValue(-1)
+        elif (self.m5_val.value() == -1):
+            self.m5_val.setValue(1)
 
-    def stringedit(self):
-        #display string format, change string format according to mx_num.value() 
-        pass
+    def flipbt(self):    #flip motor direction 
+        if (self.m6_val.value() == 1):
+            self.m6_val.setValue(-1)
+        elif (self.m6_val.value() == -1):
+            self.m6_val.setValue(1)   
 
 
-    def stringcode():
+    def stringcode(self):
         
         """
         Power: Overall scaling factor (0.4 = 40% of the full power)
@@ -150,49 +173,57 @@ class Gui(QWidget):
         problem by dividing the resultant value by 2 (e.g: 3800 becomes 1900). This is not
         a perfect scenario but it is acceptable for this application.
         """
+        self.fltV= self.m1_val.value()
+        self.frtV= self.m2_val.value()
+        self.bltV= self.m3_val.value()
+        self.brtV= self.m4_val.value()
+        self.ftV= self.m5_val.value()
+        self.btV= self.m6_val.value()
         
+        self.flMag = self.m1_mag.value()
+        self.frMag = self.m2_mag.value()
+        self.blMag = self.m3_mag.value()
+        self.brMag = self.m4_mag.value()
+        self.fMag = self.m5_mag.value()
+        self.bMag = self.m6_mag.value()            
         
         self.power = 0.4
         self.fwd_factor = 400 * self.power
         self.side_factor = 400 * self.power
         self.yaw_factor = 200
-
-        # Account for double power in case of diagonals
-        if ((self.X_Axis > 0.1 and self.Y_Axis < -0.1) or
-            (self.X_Axis < -0.1 and self.Y_Axis > 0.1) or
-                (self.X_Axis < -0.1 and self.Y_Axis < -0.1) or
-                (self.X_Axis > 0.1 and self.Y_Axis > 0.1)):
-            self.fwd_factor = 200 * self.power      # multiply by half of the power factor
-            self.side_factor = 200 * self.power
-
+        
+        
         self.fwd_left_thruster = int(
-            1500 - self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw)
+            1500 - (self.fltV)*(self.flMag))
         self.fwd_right_thruster = int(
-            1500 + self.fwd_factor * self.Y_Axis + self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw)
+            1500 + (self.frtV)*(self.frMag))
         self.bck_left_thruster = int(
-            1500 - self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw)
+            1500 - (self.bltV)*(self.blMag))
         self.bck_right_thruster = int(
-            1500 + self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw)
+            1500 + (self.brtV)*(self.brMag))
 
 
         # To go up/down
-        self.front_thruster = int(1500 + self.fwd_factor * self.Rudder)
-        self.back_thruster = int(1500 + self.fwd_factor * self.Rudder)
-
-        # ------Pitching code------
-        """
-        To pitch up/down the pilot needs to put the throttle in the +ve or -ve position. This overides
-        the above 2 lines and moves the thrusters in oppsite directions in order to pitch as required.
-        """
-        if(self.Throttle>0.1 or self.Throttle<-0.1):
-            self.front_thruster = int(1500 - self.fwd_factor * self.Throttle)
-            self.back_thruster = int(1500 - self.fwd_factor * self.Throttle)        
+        self.front_thruster = int(1500 + (self.ftV)*self.fMag)
+        self.back_thruster = int(1500 + (self.btV)*self.bMag)
         
+        self.stringInitial = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
+                              self.bck_right_thruster, self.front_thruster, self.back_thruster]
+        self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
+        self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
+                            self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
+        
+        self.stringThing = [self.stringInitial[i] for i in self.stringOrder]
+        self.stringName = [self.stringName[i] for i in self.stringOrder]
+        self.stringToSend = (str(self.stringThing) + '\n\n' + str(self.stringName))
+        print(self.stringToSend)
+        self.str_disp.setText(self.stringToSend)
+        '''
         # Final string to be sent
         self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
-                                 self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
-                                 self.arm, self.funnel, self.BT_button1, LED1, LED2, PC, self.BT])
-        #print(self.stringToSend) # Print final string    
+                                 self.bck_right_thruster, self.back_thruster, self.bck_left_thruster])
+        print(self.stringToSend) # Print final string    
+        '''
 
 def main():
 
