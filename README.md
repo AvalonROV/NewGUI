@@ -12,7 +12,7 @@ that different GUIs can be integrated with each other easily
 calculating_location
 - GUI for calculating the location of the aircraft wreck
 
-calculating_location
+calculating_power_gen
 - GUI for calculating the max power possible to be generated
 
 copilot_gui
@@ -20,15 +20,21 @@ copilot_gui
 power calculation, web address for deepzoom
 
 graphing
-- GUI for plotting OBS data from the wifi connection
+- GUI for plotting OBS data from the wifi connection (not necessary now)
+
+motor_debug
+- GUI to debug motor. User inputs thrust value [-400, 400], can flip direction
+of motor by pressing 'Flip Direction' button, and can change order of string.
+GUI displays the three lists produced from these operations if you press 
+'Display String Order' button, and displays thruster values string to console
 
 pilot_gui
 - includes two camerafeed displays, two sliders to select camerafeed source, 
 indicators for inflating and detatching lifting bag and dropping inductive power
-source
+source, readouts for IMU and depth, opens motor_debug window on startup
 
-pilot_gui_addingPC
-- same as pilot_gui but with working button for dropping inductive power circuit
+README
+- this doc
 
 single_camerafeed_display
 - using openCV to display camerafeed from the laptop webcam

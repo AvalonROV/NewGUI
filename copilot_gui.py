@@ -220,13 +220,13 @@ class Gui(QWidget):
     def calculate_loc(self):
         at = self.eng_fail_time.value()
         h = 90 - self.heading.value()   #convert heading-->cartesian   
-        hrad = ((h/180)*math.pi)        #convert rad-->deg
+        hrad = ((h/180)*math.pi)        #convert deg-->rad
         aas = self.asc_as.value()        
         ar = self.asc_rate.value()
         das = self.desc_as.value()
         dr = self.desc_rate.value()
         wd = 270 - self.w_dir.value()   #convert wind origin-->cartesian
-        wdrad = ((wd/180)*math.pi)      #convert rad-->deg 
+        wdrad = ((wd/180)*math.pi)      #convert d-->deg 
         height = (at*ar)                #height reached
         dt = (height/(dr))                #descent time
         eqn = str(self.w_eqn.text())

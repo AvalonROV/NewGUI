@@ -8,16 +8,14 @@ app = QApplication(sys.argv) # Creat a new QApplication object. This manages
                                 # the GUI application's control flow and main
                                 # settings.
 
-class Gui(QWidget):
+class MGui(QWidget):
 #base class of all user interface objects. 
 
-    def __init__(self):
-        super(Gui, self).__init__()
-        self.initUI()                        
+    def __init__(self, parent=None):
+        super(MGui, self).__init__()
+        self.motorUI()                        
 
-    def initUI(self):
-        
-        #labels for name, spinnner for magnitude, spinner for changing order, lineedit for string output, button for switch
+    def motorUI(self):
         
         name_lbl = QLabel('Name'); name_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         val_lbl = QLabel('Thrust value'); val_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
@@ -154,31 +152,13 @@ class Gui(QWidget):
 
 
     def stringcode(self):
-        
-        """
-        Power: Overall scaling factor (0.4 = 40% of the full power)
-        Fwd_factor: The power factor when moving forward/backward
-        Side_factor: The power factor when turning around (yaw)
 
-        The values for the four thrusters in the horizontal plane (fwd_left_thruster,
-        fwd_right_thruster, bck_left_thruster and bck_right_thruster) is calculated by
-        taking in the value of each of the joystic three main control axis (X, Y and Yaw)
-        values and multplying each value by the appropriate scaling factor. These values
-        are then added with respect to the relevant sign (+ve/-ve).
-
-        This is a reasonable approximation; however, this calculation has a limited
-        domain at which it is valid. Specfically, at each of the four joystick diagonal
-        axis (i.e: when X AND Y are equal to 1 or -1) the resultant value goes beyond the
-        boundaries (1100 and 1900). Therefore, a condition has been written to handle this
-        problem by dividing the resultant value by 2 (e.g: 3800 becomes 1900). This is not
-        a perfect scenario but it is acceptable for this application.
-        """
-        self.fltV= self.m1_val.value()
-        self.frtV= self.m2_val.value()
-        self.bltV= self.m3_val.value()
-        self.brtV= self.m4_val.value()
-        self.ftV= self.m5_val.value()
-        self.btV= self.m6_val.value()
+        MGui.fltV= self.m1_val.value()
+        MGui.frtV= self.m2_val.value()
+        MGui.bltV= self.m3_val.value()
+        MGui.brtV= self.m4_val.value()
+        MGui.ftV= self.m5_val.value()
+        MGui.btV= self.m6_val.value()
         
         self.flMag = self.m1_mag.value()
         self.frMag = self.m2_mag.value()
@@ -194,35 +174,35 @@ class Gui(QWidget):
         
         
         self.fwd_left_thruster = int(
-            1500 - (self.fltV)*(self.flMag))
+            1500 - (MGui.fltV)*(self.flMag))
         self.fwd_right_thruster = int(
-            1500 + (self.frtV)*(self.frMag))
+            1500 + (MGui.frtV)*(self.frMag))
         self.bck_left_thruster = int(
-            1500 - (self.bltV)*(self.blMag))
+            1500 - (MGui.bltV)*(self.blMag))
         self.bck_right_thruster = int(
-            1500 + (self.brtV)*(self.brMag))
+            1500 + (MGui.brtV)*(self.brMag))
 
 
         # To go up/down
-        self.front_thruster = int(1500 + (self.ftV)*self.fMag)
-        self.back_thruster = int(1500 + (self.btV)*self.bMag)
+        self.front_thruster = int(1500 + (MGui.ftV)*self.fMag)
+        self.back_thruster = int(1500 + (MGui.btV)*self.bMag)
         
         self.stringInitial = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
                               self.bck_right_thruster, self.front_thruster, self.back_thruster]
         self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
         self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
                             self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
-        
+        self.stringFlip = [MGui.fltV, MGui.frtV, MGui.bltV, MGui.brtV, MGui.ftV, MGui.btV]
         self.stringToSend = [self.stringInitial[i] for i in self.stringOrder]
         self.stringName = [self.stringName[i] for i in self.stringOrder]
-        self.stringToDisplay = (str(self.stringToSend) + '\n\n' + str(self.stringName))
+        self.stringToDisplay = (str(self.stringToSend) + '\n\n' + str(self.stringName) + '\n' + str(self.stringFlip))
         print(self.stringToSend)
         self.str_disp.setText(self.stringToDisplay)
         
 
 def main():
 
-    ex = Gui()
+    ex = MGui()
     sys.exit(app.exec_())
 
 
