@@ -104,10 +104,18 @@ class Gui(QWidget):
         self.icon2 = colour_box("255, 0, 0")
         self.icon3 = colour_box("255, 0, 0")
         self.icon4 = colour_box("255, 0, 0")
-        self.indicator1 = QLabel('Inflating lifting bag')
-        self.indicator2 = QLabel('Detatching lifting bag')
-        self.indicator3 = QLabel('Dropping power circuit')
-        self.indicator4 = QLabel('Depth reading')
+        self.indicator1 = QLabel('Inflating lifting bag 1')
+        self.indicator2 = QLabel('Inflating lifting bag 2')
+        self.indicator3 = QLabel('Detatching lifting bag')
+        self.indicator4 = QLabel('Dropping power circuit')
+        
+        self.depth_lbl = QLabel('Depth Reading:')
+        self.IMUx_lbl = QLabel('IMU X Value')
+        self.IMUy_lbl = QLabel('IMU Y Value')        
+        self.depth_reading = QLineEdit()
+        self.IMUx_reading = QLineEdit()
+        self.IMUy_reading = QLineEdit()
+        
 
         self.cam_slider1 = QSlider()
         self.cam_slider1.setRange(0, 5)
@@ -115,8 +123,7 @@ class Gui(QWidget):
         self.cam_slider2 = QSlider()
         self.cam_slider2.setRange(0, 5)
         self.cam_slider2.setTickPosition(3)
-        self.depth_reading = QLineEdit()
-
+        
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
         self.recieved_string_txtbox = QTextEdit()   #Create a text box to store the data received from the ROV
@@ -141,9 +148,13 @@ class Gui(QWidget):
         grid.addWidget(self.icon1, 6, 2)
         grid.addWidget(self.icon2, 7, 2)
         grid.addWidget(self.icon3, 8, 2)
-        grid.addWidget(self.icon4, 9, 2)        
-        grid.addWidget(self.depth_reading, 10, 2)
-
+        grid.addWidget(self.icon4, 9, 2)
+        grid.addWidget(self.depth_lbl, 11, 1)
+        grid.addWidget(self.depth_reading, 11, 2)
+        grid.addWidget(self.IMUx_lbl, 12, 1)
+        grid.addWidget(self.IMUx_reading, 12, 2)
+        grid.addWidget(self.IMUy_lbl, 13, 1)
+        grid.addWidget(self.IMUy_reading, 13, 2)
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 100, 600, 300)
@@ -156,8 +167,8 @@ class Gui(QWidget):
         This function formats the string that will be sent to the ROV containg the
         commands.
 
-        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, LB2, DPC, BT]
-
+        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, LB2,DB1, DPC, BT]
+DB
         FL: Forward Left Thruster 
         FU: Forward Up Thruster
         FR: Forward Right Thruster
@@ -172,11 +183,9 @@ class Gui(QWidget):
         1 -> clockwise/opening
         2 -> anti-clockwise/closing
 
-        LB1: On-baord LED
-        LB2: On-board LED
         DPC: power circuit dropped indicator
-        LB1: lifring bag 1
-        LB2: lifring bag 2
+        LB1: lifting bag 1
+        LB2: lifting bag 2
         DB1: drop bag 1
         
         0 -> OFF
@@ -191,12 +200,12 @@ class Gui(QWidget):
         self.Throttle = my_joystick.get_axis(2)
         self.Yaw = my_joystick.get_axis(3)
         self.Rudder = my_joystick.get_axis(4)
-        self.button5 = my_joystick.get_button(4)  # Button 5
-        self.button6 = my_joystick.get_button(5)  # Button 6
-        self.button7 = my_joystick.get_button(6)  # Button 7
+        self.LB1_button = my_joystick.get_button(4)  # Button 5
+        self.LB2_button = my_joystick.get_button(5)  # Button 6
+        self.DB1_button = my_joystick.get_button(6)  # Button 7
+        self.buttonSE = my_joystick.get_button(10)  # Button SE
+        self.buttonST = my_joystick.get_button(11)  # Button ST
         self.DPC_button = my_joystick.get_button(7)  # Button 8
-        self.LB1_button = my_joystick.get_button(10)  # Button SE
-        self.LB2_button = my_joystick.get_button(11)  # Button ST
         self.button4 = my_joystick.get_button(3)  # Button 4, L3
 
 
@@ -210,10 +219,8 @@ class Gui(QWidget):
         self.arm = 0
         global LB1
         global LB2
+        global DB1
         global DPC
-        global LB1
-        global LB2
-        global DB2
 
         # ================================ Thrusters Power ================================
         """
@@ -272,17 +279,6 @@ class Gui(QWidget):
 
 
         # ================================ Manipulators ================================
-        # Funnel
-        if (self.button5 == 1):
-            self.funnel = 1
-        elif (self.button6 == 1):
-            self.funnel = 2
-
-        # Arm
-        if (self.button7 == 1):
-            self.arm = 1
-        elif (self.button8 == 1):
-            self.arm = 2
 
         # LB1
         if (self.LB1_button == 1):
@@ -290,47 +286,42 @@ class Gui(QWidget):
             if (LB1 == 1):
                 LB1 = 0
                 self.icon1.change_colour("0, 255, 0")
-                #self.led1_indicator.setPixmap(self.red_circle_indicator)
             else:
                 LB1 = 1
                 self.icon1.change_colour("0, 255, 0")
-                #self.led1_indicator.setPixmap(self.green_circle_indicator)
+
 
         # LB2
         if (self.LB2_button == 1):
             sleep(0.2)
             if (LB2 == 1):
                 LB2 = 0
-                self.icon2.change_colour("255, 0, 0")
-                #self.led2_indicator.setPixmap(self.red_circle_indicator)
+                self.icon2.change_colour("0, 255, 0")
             else:
                 LB2 = 1
                 self.icon2.change_colour("0, 255, 0")
-                #self.led2_indicator.setPixmap(self.green_circle_indicator)
 
-        # DPC
-        if (self.DPC_button == 1):
-            sleep(0.2)
-            if (DPC == 1):
-                DPC = 0
-                self.icon3.change_colour("255, 0, 0")
-                #self.led2_indicator.setPixmap(self.red_circle_indicator)
-            else:
-                DPC = 1
-                self.icon3.change_colour("0, 255, 0")
-                #self.led2_indicator.setPixmap(self.green_circle_indicator)
                 
         # DB1
         if (self.DB1_button == 1):
             sleep(0.2)
             if (DB1 == 1):
                 DB1 = 0
-                self.icon4.change_colour("255, 0, 0")
-                #self.led2_indicator.setPixmap(self.red_circle_indicator)
+                self.icon3.change_colour("255, 0, 0")
             else:
                 DB1 = 1
+                self.icon3.change_colour("0, 255, 0")
+
+
+        # DPC
+        if (self.DPC_button == 1):
+            sleep(0.2)
+            if (DPC == 1):
+                DPC = 0
+                self.icon4.change_colour("255, 0, 0")
+            else:
+                DPC = 1
                 self.icon4.change_colour("0, 255, 0")
-                #self.led2_indicator.setPixmap(self.green_circle_indicator)
 
 
 
@@ -343,7 +334,7 @@ class Gui(QWidget):
         # Final string to be sent
         self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
                                  self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
-                                 self.arm, self.funnel, self.BT_button1, LB1, LB2, DPC, self.BT])
+                                 self.arm, self.funnel, self.BT_button1, LB1, LB2,DB1, DPC, self.BT])
         #print(self.stringToSend) # Print final string
 
     def information(self):
