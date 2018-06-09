@@ -1,21 +1,36 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import sys
-import numpy as np
 from PyQt4.QtGui import*
 from PyQt4.QtCore import *
-from time import sleep
+
 
 app = QApplication(sys.argv) # Creat a new QApplication object. This manages
-                                # the GUI application's control flow and main
-                                # settings.
-                            
+# the GUI application's control flow and main
+# settings.
+    
+'''
+        need to be able to store the flip value (mx_value), string order (mx_num) 
+        '''
+
+
 class MGui(QWidget):
 #base class of all user interface objects. 
 
     def __init__(self, parent=None):
         super(MGui, self).__init__()
-        self.motorUI()                        
-    
+        self.motorUI()         
+        MGui.fltV = self.m1_val.value()
+        MGui.frtV = self.m2_val.value()
+        MGui.bltV = self.m3_val.value()
+        MGui.brtV = self.m4_val.value()
+        MGui.ftV = self.m5_val.value()
+        MGui.btV = self.m6_val.value()
+
     def motorUI(self):
+        
+        #labels for name, spinnner for magnitude, spinner for changing order, lineedit for string output, button for switch
         
         name_lbl = QLabel('Name'); name_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         val_lbl = QLabel('Thrust value'); val_lbl.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
@@ -110,7 +125,7 @@ class MGui(QWidget):
         
         self.setLayout(grid)    #Set the layout
 
-        self.setGeometry(10, 100, 600, 300)
+        self.setGeometry(10, 100, 900, 300)
         self.setWindowTitle('Debug Motors')    
         self.show()    
         
@@ -153,12 +168,12 @@ class MGui(QWidget):
 
     def stringcode(self):
 
-        MGui.fltV= self.m1_val.value()
-        MGui.frtV= self.m2_val.value()
-        MGui.bltV= self.m3_val.value()
-        MGui.brtV= self.m4_val.value()
-        MGui.ftV= self.m5_val.value()
-        MGui.btV= self.m6_val.value()
+        MGui.fltV = self.m1_val.value()
+        MGui.frtV = self.m2_val.value()
+        MGui.bltV = self.m3_val.value()
+        MGui.brtV = self.m4_val.value()
+        MGui.ftV = self.m5_val.value()
+        MGui.btV = self.m6_val.value()
         
         self.flMag = self.m1_mag.value()
         self.frMag = self.m2_mag.value()
@@ -187,22 +202,47 @@ class MGui(QWidget):
         self.front_thruster = int(1500 + (MGui.ftV)*self.fMag)
         self.back_thruster = int(1500 + (MGui.btV)*self.bMag)
         
-        self.stringInitial = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
+        self.stringThrust = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
                               self.bck_right_thruster, self.front_thruster, self.back_thruster]
         self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
         self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
                             self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
         self.stringFlip = [MGui.fltV, MGui.frtV, MGui.bltV, MGui.brtV, MGui.ftV, MGui.btV]
-        self.stringToSend = [self.stringInitial[i] for i in self.stringOrder]
-        self.stringName = [self.stringName[i] for i in self.stringOrder]
-        self.stringToDisplay = (str(self.stringToSend) + '\n' + str(self.stringName) + '\n' + str(self.stringFlip))
-        print(self.stringToSend)
+        self.stringThrust_s = [self.stringThrust[i] for i in self.stringOrder]
+        self.stringName_s = [self.stringName[i] for i in self.stringOrder]
+        self.stringFlip_s = [self.stringFlip[i] for i in self.stringOrder]
+        self.stringToDisplay = (str(self.stringName_s)+ '\n' + str(self.stringThrust_s) + '\n' + str(self.stringFlip_s))
+        print(self.stringThrust_s)
         self.str_disp.setText(self.stringToDisplay)
+
+
+class Gui(QWidget):
+#base class of all user interface objects. 
+
+    def __init__(self):
+        super(Gui, self).__init__()
+        self.initUI()
+        #self.motorWindow = MGui(self)
+
+    def initUI(self):
+
+        mtr_button = QPushButton('motor debug')
+        mtr_button.clicked.connect(self.motorGUI)
+
+        grid = QGridLayout()              #Create layout container
+        grid.addWidget(mtr_button, 1, 1)
+        self.setLayout(grid)    #Set the layout
+
+        self.setGeometry(10, 100, 600, 300)
+        self.setWindowTitle('Test')    
+        self.show()
         
+    def motorGUI(self):
+        self.motorWindow = MGui(self)
 
 def main():
 
-    ex = MGui()
+    ex = Gui()
     sys.exit(app.exec_())
 
 

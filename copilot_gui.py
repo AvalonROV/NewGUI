@@ -236,8 +236,9 @@ class Gui(QWidget):
         dy = (dt*das*math.sin(hrad))   
         def integrand(t):
             return eval(eqn)
-            #return -(t/720)**2 + 25
-        wd, err = quad(integrand, at, at+dt)
+            #return -(t/720)**2 + 25#
+        wd, err = quad(integrand, 0, dt)
+        #wd, err = quad(integrand, at, at+dt)
         wx = (wd*math.cos(wdrad))
         wy = (wd*math.sin(wdrad))
         totalx = (ax + dx + wx)

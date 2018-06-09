@@ -14,7 +14,6 @@ import sys
 import numpy as np
 from PyQt4.QtGui import*
 from PyQt4.QtCore import *
-import pygame
 from time import sleep
 
 
@@ -22,10 +21,6 @@ from time import sleep
 PyGame is used to get and process data from the joystick.
 """
 
-pygame.init()   # Initialise PyGame
-my_joystick = pygame.joystick.Joystick(0)   # Create a joystick object
-my_joystick.init()  # Initialise the Joystick
-clock = pygame.time.Clock() # Create a clock object to track time
 
 app = QApplication(sys.argv) # Creat a new QApplication object. This manages
                                 # the GUI application's control flow and main
@@ -362,54 +357,6 @@ class Gui(QWidget):
         
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
-        """
-        This function formats the string that will be sent to the ROV containg the
-        commands.
-
-        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, LB2,DB1, DPC, BT]
-DB
-        FL: Forward Left Thruster 
-        FU: Forward Up Thruster
-        FR: Forward Right Thruster
-        BR: Backward Right Thruster
-        BU: Backward Up Thruster
-        BL: Backward Left Thruster
-        Thrusters values are between 1100 and 1900, with 1500 being nominal (at rest).
-
-        0 -> not moving
-        1 -> clockwise/opening
-        2 -> anti-clockwise/closing
-
-        DPC: power circuit dropped indicator
-        LB1: lifting bag 1
-        LB2: lifting bag 2
-        DB1: drop bag 1
-        
-        0 -> OFF
-        1 -> ON
-
-
-        BT: Bluetooth
-        """
-        # ------ Storing the values from the different axis on joystick------#
-        self.X_Axis = my_joystick.get_axis(0)  # X_Axis- Axis 0
-        self.Y_Axis = my_joystick.get_axis(1)  # Y_Axis - Axis 1
-        self.Throttle = my_joystick.get_axis(2)
-        self.Yaw = my_joystick.get_axis(3)
-        self.Rudder = my_joystick.get_axis(4)
-        self.LB1_button = my_joystick.get_button(4)  # Button 5
-        self.LB2_button = my_joystick.get_button(5)  # Button 6
-        self.DB1_button = my_joystick.get_button(6)  # Button 7
-        self.buttonSE = my_joystick.get_button(10)  # Button SE
-        self.buttonST = my_joystick.get_button(11)  # Button ST
-        self.DPC_button = my_joystick.get_button(7)  # Button 8
-        self.button4 = my_joystick.get_button(3)  # Button 4, L3
-
-
-        # Bluetooth controls
-        self.BT_button1 = my_joystick.get_button(0)
-        self.BT_button2 = my_joystick.get_button(1)
-
         # Initital values
         self.BT = 0
         self.funnel = 0
@@ -444,113 +391,9 @@ DB
         self.yaw_factor = 200
 
         # Account for double power in case of diagonals
-        if ((self.X_Axis > 0.1 and self.Y_Axis < -0.1) or
-            (self.X_Axis < -0.1 and self.Y_Axis > 0.1) or
-                (self.X_Axis < -0.1 and self.Y_Axis < -0.1) or
-                (self.X_Axis > 0.1 and self.Y_Axis > 0.1)):
-            self.fwd_factor = 200 * self.power      # multiply by half of the power factor
-            self.side_factor = 200 * self.power
-            
-        self.fwd_left_thruster = int(
-            1500 - (self.motorWindow.fltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
-        self.fwd_right_thruster = int(
-            1500 + (self.motorWindow.frtV)*(self.fwd_factor * self.Y_Axis + self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
-        self.bck_left_thruster = int(
-            1500 - (self.motorWindow.bltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
-        self.bck_right_thruster = int(
-            1500 + (self.motorWindow.brtV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
-
-
-        # To go up/down
-        self.front_thruster = int(1500 + (self.motorWindow.ftV)*(self.fwd_factor * self.Rudder))
-        self.back_thruster = int(1500 + (self.motorWindow.btV)*(self.fwd_factor * self.Rudder))
-
-        # ------Pitching code------
-        """
-        To pitch up/down the pilot needs to put the throttle in the +ve or -ve position. This overides
-        the above 2 lines and moves the thrusters in oppsite directions in order to pitch as required.
-        """
-        if(self.Throttle>0.1 or self.Throttle<-0.1):
-            self.front_thruster = int(1500 - (self.motorWindow.ftV)*(self.fwd_factor * self.Throttle))
-            self.back_thruster = int(1500 - (self.motorWindow.btV)*(self.fwd_factor * self.Throttle))
-
-
-        # ================================ Manipulators ================================
-
-        # LB1
-        if (self.LB1_button == 1):
-            sleep(0.2)
-            if (LB1 == 1):
-                LB1 = 0
-                self.icon1.change_colour("0, 255, 0")
-            else:
-                LB1 = 1
-                self.icon1.change_colour("0, 255, 0")
-
-
-        # LB2
-        if (self.LB2_button == 1):
-            sleep(0.2)
-            if (LB2 == 1):
-                LB2 = 0
-                self.icon2.change_colour("0, 255, 0")
-            else:
-                LB2 = 1
-                self.icon2.change_colour("0, 255, 0")
-
-                
-        # DB1
-        if (self.DB1_button == 1):
-            sleep(0.2)
-            if (DB1 == 1):
-                DB1 = 0
-                self.icon3.change_colour("255, 0, 0")
-            else:
-                DB1 = 1
-                self.icon3.change_colour("0, 255, 0")
-
-
-        # DPC
-        if (self.DPC_button == 1):
-            sleep(0.2)
-            if (DPC == 1):
-                DPC = 0
-                self.icon4.change_colour("255, 0, 0")
-            else:
-                DPC = 1
-                self.icon4.change_colour("0, 255, 0")
-
-
-
-        # Bluetooth
-        if(self.BT_button1 == 1):
-            self.BT = 1
-        elif(self.BT_button2 == 1):
-            self.BT = 2
-
-        # Final string to be sent
-        self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
-                                 self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
-                                 self.arm, self.funnel, self.BT_button1, LB1, LB2,DB1, DPC, self.BT])
-        print(self.stringToSend) # Print final string
     
     def information(self):
-        """
-        This function reads parameters from the joystick and sends the formatted string to the ROV.
-        """
-        name_joystick = my_joystick.get_name()  # Collects the pre-defined name of joystick
-        number_axes = my_joystick.get_numaxes()  # Collects the pre-defined number of axis
-        number_buttons = my_joystick.get_numbuttons()  # Collects the pre-defined number of buttons
-
-        try:    # Read data from the ROV
-            recieved_string = recieve_socket.recv(1024).decode()
-            self.complete_recieved_string += recieved_string + '\n'
-            self.recieved_string_txtbox.setText(self.complete_recieved_string)
-        except:
-            pass
-
-        self.string_formatter()  # Calling the thruster value
-
+        pass
 
 #---------------- beginning of video class
 class Video():
@@ -603,16 +446,6 @@ class Worker(QThread):
     def __init__(self):
         QThread.__init__(self, parent=app)
 
-    def run(self):
-        EXIT = False
-        while not EXIT:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    EXIT = True
-            self.emit(SIGNAL('Hello'))
-            clock.tick(30) #This determines how fast the frames change per second
-        pygame.quit() # This is used to quit pygame and use any internal program within the python
-        quit()
 
 def main():
 
