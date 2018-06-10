@@ -16,6 +16,8 @@ from PyQt4.QtGui import*
 from PyQt4.QtCore import *
 import pygame
 from time import sleep
+from avalon_frontend import ROV
+import converttobinary
 
 
 """
@@ -30,12 +32,8 @@ clock = pygame.time.Clock() # Create a clock object to track time
 app = QApplication(sys.argv) # Creat a new QApplication object. This manages
                                 # the GUI application's control flow and main
                                 # settings.
-
-# Global variables defining the ROV LEDs status
-LB1 = 0
-LB2 = 0
-DPC = 0
-DB1 = 0
+CAM1 = 0
+CAM2 = 0
 
 class MGui(QWidget):
 #base class of all user interface objects. 
@@ -245,14 +243,17 @@ class Gui(QWidget):
         super(Gui, self).__init__()
 
         self.initUI()
-        #self.motorWindow = MGui(self)
+        self.motorWindow = MGui(self)
         
+        self.frontend = ROV("127.0.0.1", 8000)
+
         self.string_formatter()
         # ------THREADING-----#
         """
         This is used to process the joystick data in the background
         """
         self.thread = Worker()  #Define a thread object
+        
         self.connect(self.thread, SIGNAL('Hello'), self.information) # Connect the incoming signal from the
                                                                         # thread to the 'information' function
         self.thread.start() #Start the thread
@@ -298,9 +299,9 @@ class Gui(QWidget):
         self.icon3 = colour_box("255, 0, 0")
         self.icon4 = colour_box("255, 0, 0")
         self.indicator1 = QLabel('Inflating lifting bag 1')
-        self.indicator2 = QLabel('Inflating lifting bag 2')
-        self.indicator3 = QLabel('Detatching lifting bag')
-        self.indicator4 = QLabel('Dropping power circuit')
+        self.indicator2 = QLabel('Detaching lifting bag 1 Magnet')
+        self.indicator3 = QLabel('Detaching lifting bag 2 Magnet')
+        self.indicator4 = QLabel('Detaching lifting bag 1')
         
         self.depth_lbl = QLabel('Depth Reading:')
         self.IMUx_lbl = QLabel('IMU X Value')
@@ -314,10 +315,12 @@ class Gui(QWidget):
 
         self.cam_slider1 = QSlider()
         self.cam_slider1.setRange(0, 5)
-        self.cam_slider1.setTickPosition(3) #sets tick position to either side of the slider
+        self.cam_slider1.setTickPosition(0) #sets tick position to either side of the slider
+        self.cam_slider1.valueChanged.connect(self.on_slider1_changed)
         self.cam_slider2 = QSlider()
         self.cam_slider2.setRange(0, 5)
-        self.cam_slider2.setTickPosition(3)
+        self.cam_slider2.setTickPosition(0)
+        self.cam_slider2.valueChanged.connect(self.on_slider2_changed)
         
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
@@ -359,6 +362,16 @@ class Gui(QWidget):
 
     def on_motor_btn_clicked(self):
         self.motorWindow = MGui(self)
+    
+    def on_slider1_changed(self):
+        CAM1 = self.cam_slider1.value()
+        self.frontend.set_selected_cameras(CAM1, CAM2)
+        #self.frontend.set_selected_cameras(self.cam_slider1.value(),self.cam_slider2.value())
+
+    def on_slider2_changed(self):
+        CAM2 = self.cam_slider2.value()
+        self.frontend.set_selected_cameras(CAM1, CAM2)
+        #self.frontend.set_selected_cameras(self.cam_slider1.value(), self.cam_slider2.value())
         
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
@@ -366,7 +379,7 @@ class Gui(QWidget):
         This function formats the string that will be sent to the ROV containg the
         commands.
 
-        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, LB2,DB1, DPC, BT]
+        The format of the string is: [FL, FU, FR, BR, BU, BL, ARM, FUN, LB1, DB1, DPC, BT]
 DB
         FL: Forward Left Thruster 
         FU: Forward Up Thruster
@@ -382,7 +395,6 @@ DB
 
         DPC: power circuit dropped indicator
         LB1: lifting bag 1
-        LB2: lifting bag 2
         DB1: drop bag 1
         
         0 -> OFF
@@ -397,27 +409,27 @@ DB
         self.Throttle = my_joystick.get_axis(2)
         self.Yaw = my_joystick.get_axis(3)
         self.Rudder = my_joystick.get_axis(4)
+        self.one_button = my_joystick.get_button(0)  # Button 1
+        self.two_button = my_joystick.get_button(1)  # Button 2
+        self.DB1_button = my_joystick.get_button(2)  # Button 3
         self.LB1_button = my_joystick.get_button(4)  # Button 5
-        self.LB2_button = my_joystick.get_button(5)  # Button 6
-        self.DB1_button = my_joystick.get_button(6)  # Button 7
-        self.buttonSE = my_joystick.get_button(10)  # Button SE
-        self.buttonST = my_joystick.get_button(11)  # Button ST
-        self.DPC_button = my_joystick.get_button(7)  # Button 8
-        self.button4 = my_joystick.get_button(3)  # Button 4, L3
+        self.EM1_button = my_joystick.get_button(5)  # Button 6
+        self.EM2_button = my_joystick.get_button(6)  # Button 7
+        self.SE_button = my_joystick.get_button(10)  # Button SE
+        self.ST_button = my_joystick.get_button(11)  # Button ST
+        self.AXIS_button = my_joystick.get_button(7)  # Button 8
+        self.GRAB_button = my_joystick.get_button(3)  # Button 4, L3
 
-
-        # Bluetooth controls
-        self.BT_button1 = my_joystick.get_button(0)
-        self.BT_button2 = my_joystick.get_button(1)
 
         # Initital values
-        self.BT = 0
-        self.funnel = 0
-        self.arm = 0
-        global LB1
-        global LB2
-        global DB1
-        global DPC
+        # blah like self.funnel = 0 or global LB1
+        self.LB1 = 0
+        self.DB1 = 0
+        self.GRAB = 0
+        self.EM1 = 0
+        self.EM2 = 0
+        global CAM1
+        global CAM2
 
         # ================================ Thrusters Power ================================
         """
@@ -482,58 +494,80 @@ DB
             sleep(0.2)
             if (LB1 == 1):
                 LB1 = 0
+                self.frontend.set_lift_bag_inflate(0)
                 self.icon1.change_colour("0, 255, 0")
             else:
                 LB1 = 1
+                self.frontend.set_lift_bag_inflate(1)
                 self.icon1.change_colour("0, 255, 0")
 
 
-        # LB2
-        if (self.LB2_button == 1):
+        # EM1
+        if (self.EM1_button == 1):
             sleep(0.2)
-            if (LB2 == 1):
-                LB2 = 0
-                self.icon2.change_colour("0, 255, 0")
+            if (EM1 == 1):
+                EM1 = 0
+                self.frontend.set_lift_bag_release(0)
+                self.icon2.change_colour("255, 0, 0")
             else:
-                LB2 = 1
+                EM1 = 1
+                self.frontend.set_lift_bag_release(1)
                 self.icon2.change_colour("0, 255, 0")
 
-                
+
+        # EM2
+        if (self.EM2_button == 1):
+            sleep(0.2)
+            if (EM3 == 1):
+                EM3 = 0
+                self.frontend.set_lift_bag_release(0)
+                self.icon3.change_colour("255, 0, 0")
+            else:
+                EM2 = 1
+                self.frontend.set_lift_bag_release(1)
+                self.icon3.change_colour("0, 255, 0")
+
+
         # DB1
         if (self.DB1_button == 1):
             sleep(0.2)
             if (DB1 == 1):
                 DB1 = 0
-                self.icon3.change_colour("255, 0, 0")
-            else:
-                DB1 = 1
-                self.icon3.change_colour("0, 255, 0")
-
-
-        # DPC
-        if (self.DPC_button == 1):
-            sleep(0.2)
-            if (DPC == 1):
-                DPC = 0
+                self.frontend.set_lift_bag_release(0)
                 self.icon4.change_colour("255, 0, 0")
             else:
-                DPC = 1
+                DB1 = 1
+                self.frontend.set_lift_bag_release(1)
                 self.icon4.change_colour("0, 255, 0")
 
 
+        # GRAB
+        if (self.GRAB_button == 1):
+            sleep(0.2)
+            if (GRAB == 1):
+                GRAB = 0
+                self.frontend.set_grabber_position(0)
+            else:
+                GRAB = 1
+                self.frontend.set_grabber_position(1)
 
-        # Bluetooth
-        if(self.BT_button1 == 1):
-            self.BT = 1
-        elif(self.BT_button2 == 1):
-            self.BT = 2
 
-        # Final string to be sent
-        self.stringToSend = str([self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
-                                 self.bck_right_thruster, self.back_thruster, self.bck_left_thruster,
-                                 self.arm, self.funnel, self.BT_button1, LB1, LB2,DB1, DPC, self.BT])
-        print(self.stringToSend) # Print final string
-    
+        # AXIS
+        if (self.AXIS_button == 1):
+            sleep(0.2)
+            if (AXIS == 1):
+                AXIS = 0
+                self.frontend.set_axis_stable(0)
+            else:
+                AXIS = 1
+                self.frontend.set_axis_stable(1)
+        
+        thruster_string = [self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
+                           self.bck_right_thruster, self.back_thruster, self.bck_left_thruster]
+        self.frontend.set_thrusts(thruster_string)
+        #print(thruster_string)
+
+
     def information(self):
         """
         This function reads parameters from the joystick and sends the formatted string to the ROV.
@@ -543,14 +577,24 @@ DB
         number_buttons = my_joystick.get_numbuttons()  # Collects the pre-defined number of buttons
 
         try:    # Read data from the ROV
-            recieved_string = recieve_socket.recv(1024).decode()
-            self.complete_recieved_string += recieved_string + '\n'
-            self.recieved_string_txtbox.setText(self.complete_recieved_string)
+            self.frontend.recieve_parameters()
+            #recieved_string = recieve_socket.recv(1024).decode()
+            #self.complete_recieved_string += recieved_string + '\n'
+            #self.recieved_string_txtbox.setText(self.complete_recieved_string)
         except:
             pass
 
         self.string_formatter()  # Calling the thruster value
-
+        self.frontend.send_settings()   
+        self.set_values()
+        
+    def set_values(self):
+        self.depth_reading.setText(str(self.frontend.get_depth()))
+        x_value = self.frontend.get_imu()[0]
+        y_value = self.frontend.get_imu()[1]
+        self.IMUx_reading.setText(str(x_value))
+        self.IMUy_reading.setText(str(y_value))
+        
 
 #---------------- beginning of video class
 class Video():
@@ -615,7 +659,7 @@ class Worker(QThread):
         quit()
 
 def main():
-
+    
     ex = Gui()
     sys.exit(app.exec_())
 

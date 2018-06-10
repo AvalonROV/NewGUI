@@ -1,5 +1,4 @@
-#obs graph, imu reading, depth, power generation calculation
-#ADD LINEEDIT TO INPUT THE EXPRESSION TO BE INTEGRATED
+#add the record depth button
 
 import sys
 import numpy as np
@@ -14,6 +13,8 @@ import random
 # end of matplotlib imports
 from PyQt4.QtGui import*
 from PyQt4.QtCore import *
+from avalon_frontend import ROV
+import converttobinary
 
 app = QApplication(sys.argv)
 
@@ -23,6 +24,8 @@ class Gui(QWidget):
     def __init__(self):
         super(Gui, self).__init__()
         self.initUI()
+
+        self.frontend = ROV("127.0.0.1", 8000)
 
     def initUI(self):
         
@@ -64,6 +67,9 @@ class Gui(QWidget):
         self.imu_y = QLineEdit()
         depth_lbl = QLabel('Depth Reading:')
         self.depth = QLineEdit()
+        self.depth.setText('0')
+        depth_record_btn = QPushButton('Record Depth')
+        depth_record_btn.clicked.connect(self.calculate_depth)
         
         #display gui for calculating location of a/c wreckage
         location_task = QLabel('Calculating Location of Wreckage')
@@ -96,7 +102,7 @@ class Gui(QWidget):
         self.asc_rate = QDoubleSpinBox()
         self.eng_fail_time = QDoubleSpinBox(); self.eng_fail_time.setRange(0, 1000)
         self.desc_as = QDoubleSpinBox()
-        self.desc_rate = QDoubleSpinBox()
+        self.desc_rate = QDoubleSpinBox(); self.desc_rate.setValue(1)
         self.w_dir = QDoubleSpinBox(); self.w_dir.setRange(0, 360)
         self.w_eqn = QLineEdit(); self.w_eqn.setText('-(t/720)**2 + 25')
         self.asc_dist_x = QDoubleSpinBox(); self.asc_dist_x.setRange(-10000, 10000)
@@ -126,7 +132,6 @@ class Gui(QWidget):
         p_calc.addWidget(water_vel_lbl, 4, 1); p_calc.addWidget(self.water_vel, 4, 2)
         p_calc.addWidget(efficiency_lbl, 5, 1); p_calc.addWidget(self.efficiency, 5, 2)
         p_calc.addWidget(p_calc_btn, 6, 1, 1, 2)
-        #p_calc.addWidget(blank, 6, 1, 1, 1)
         p_calc.addWidget(ans_lbl, 8, 1); p_calc.addWidget(self.p_ans, 8, 2)
         p_calc.addWidget(blank, 7, 1)
         p_calc.addWidget(power_url_lbl, 9, 1); p_calc.addWidget(power_url, 10, 1, 1, 2)
@@ -135,8 +140,9 @@ class Gui(QWidget):
         p_calc.addWidget(imu_x_lbl, 13, 1); p_calc.addWidget(self.imu_x, 13, 2)
         p_calc.addWidget(imu_y_lbl, 14, 1); p_calc.addWidget(self.imu_y, 14, 2)
         p_calc.addWidget(blank, 15, 1)
-        p_calc.addWidget(depth_lbl, 16, 1); p_calc.addWidget(self.depth, 16, 2)
-        p_calc.addWidget(blank, 17, 3)
+        p_calc.addWidget(depth_record_btn, 17, 1)
+        p_calc.addWidget(depth_lbl, 18, 1); p_calc.addWidget(self.depth, 18, 2)
+        p_calc.addWidget(blank, 19, 3)
         
         # create calculating location layout container        
         loc_calc = QGridLayout()
@@ -183,6 +189,7 @@ class Gui(QWidget):
 
     def plot(self):
         #plot some random stuff 
+        OBS_points = self.frontend.get_imu()
 
         # create an axis
         ax = self.figure.add_subplot(111)
@@ -193,12 +200,8 @@ class Gui(QWidget):
         ax.grid(which='both', linestyle='-')
         ax.set_xlabel('Time')
         ax.set_ylabel('Amplitude')        
-        ax.set_xticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
-        # plot data
-        #data = [random.random() for i in range(14)]
-        #ax.plot(data, '*-') 
-        #OR:
-        ax.plot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [random.random() for i in range(14)], 'x-')
+        ax.set_xticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+        ax.plot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], OBS_points, 'x-')
         '''
         here we will get the data from the C++ wrapper by importing it as a library/module and using 
         a method from said library/module to get the sizemometer data.
@@ -274,6 +277,13 @@ class Gui(QWidget):
     
 
 
+        
+    def calculate_depth(self):
+        recorded_depth = 0.0
+        current_depth = 0.0
+        recorded_depth = float(self.frontend.get_depth())
+        current_depth = self.frontend.get_depth() - recorded_depth
+        self.depth.setText(str(current_depth))
 
 def main():
 
