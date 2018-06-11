@@ -18,6 +18,7 @@ import pygame
 from time import sleep
 from avalon_frontend import ROV
 import converttobinary
+import UndistortAND_Distance_Detection
 
 
 """
@@ -41,12 +42,12 @@ class MGui(QWidget):
     def __init__(self, parent=None):
         super(MGui, self).__init__()
         self.motorUI()         
-        MGui.fltV = self.m1_val.value()
-        MGui.frtV = self.m2_val.value()
-        MGui.bltV = self.m3_val.value()
-        MGui.brtV = self.m4_val.value()
-        MGui.ftV = self.m5_val.value()
-        MGui.btV = self.m6_val.value()
+        #MGui.fltV = self.m1_val.value()
+        #MGui.frtV = self.m2_val.value()
+        #MGui.bltV = self.m3_val.value()
+        #MGui.brtV = self.m4_val.value()
+        #MGui.ftV = self.m5_val.value()
+        #MGui.btV = self.m6_val.value()
 
     def motorUI(self):
         
@@ -79,19 +80,19 @@ class MGui(QWidget):
         m5_btn = QPushButton('Flip Direction'); m5_btn.clicked.connect(self.flipft)
         m6_btn = QPushButton('Flip Direction'); m6_btn.clicked.connect(self.flipbt)
         
-        self.m1_val = QSpinBox(); self.m1_val.setValue(1); self.m1_val.setRange(-1, 1)
-        self.m2_val = QSpinBox(); self.m2_val.setValue(1); self.m2_val.setRange(-1, 1)
-        self.m3_val = QSpinBox(); self.m3_val.setValue(1); self.m3_val.setRange(-1, 1)
-        self.m4_val = QSpinBox(); self.m4_val.setValue(1); self.m4_val.setRange(-1, 1)
-        self.m5_val = QSpinBox(); self.m5_val.setValue(1); self.m5_val.setRange(-1, 1)
-        self.m6_val = QSpinBox(); self.m6_val.setValue(1); self.m6_val.setRange(-1, 1)
+        self.m1_val = QSpinBox(); self.m1_val.setValue(Gui.fltV); self.m1_val.setRange(-1, 1)
+        self.m2_val = QSpinBox(); self.m2_val.setValue(Gui.frtV); self.m2_val.setRange(-1, 1)
+        self.m3_val = QSpinBox(); self.m3_val.setValue(Gui.bltV); self.m3_val.setRange(-1, 1)
+        self.m4_val = QSpinBox(); self.m4_val.setValue(Gui.brtV); self.m4_val.setRange(-1, 1)
+        self.m5_val = QSpinBox(); self.m5_val.setValue(Gui.ftV); self.m5_val.setRange(-1, 1)
+        self.m6_val = QSpinBox(); self.m6_val.setValue(Gui.btV); self.m6_val.setRange(-1, 1)
 
-        self.m1_num = QSpinBox(); self.m1_num.setRange(1, 6); self.m1_num.setValue(1)
-        self.m2_num = QSpinBox(); self.m2_num.setRange(1, 6); self.m2_num.setValue(2)
-        self.m3_num = QSpinBox(); self.m3_num.setRange(1, 6); self.m3_num.setValue(3)
-        self.m4_num = QSpinBox(); self.m4_num.setRange(1, 6); self.m4_num.setValue(4)
-        self.m5_num = QSpinBox(); self.m5_num.setRange(1, 6); self.m5_num.setValue(5)
-        self.m6_num = QSpinBox(); self.m6_num.setRange(1, 6); self.m6_num.setValue(6)
+        self.m1_num = QSpinBox(); self.m1_num.setRange(1, 6); self.m1_num.setValue(Gui.fltO)
+        self.m2_num = QSpinBox(); self.m2_num.setRange(1, 6); self.m2_num.setValue(Gui.frtO)
+        self.m3_num = QSpinBox(); self.m3_num.setRange(1, 6); self.m3_num.setValue(Gui.bltO)
+        self.m4_num = QSpinBox(); self.m4_num.setRange(1, 6); self.m4_num.setValue(Gui.brtO)
+        self.m5_num = QSpinBox(); self.m5_num.setRange(1, 6); self.m5_num.setValue(Gui.ftO)
+        self.m6_num = QSpinBox(); self.m6_num.setRange(1, 6); self.m6_num.setValue(Gui.btO)
         
         self.str_disp = QTextEdit('blank')
         str_disp_btn = QPushButton('Display String Order'); str_disp_btn.clicked.connect(self.stringcode)
@@ -227,6 +228,8 @@ class MGui(QWidget):
         self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
         self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
                             self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
+        self.stringOrderNumbers = [self.m1_num.value(), self.m2_num.value(), self.m3_num.value(), 
+                            self.m4_num.value(), self.m5_num.value(), self.m6_num.value()]
         self.stringFlip = [MGui.fltV, MGui.frtV, MGui.bltV, MGui.brtV, MGui.ftV, MGui.btV]
         self.stringThrust_s = [self.stringThrust[i] for i in self.stringOrder]
         self.stringName_s = [self.stringName[i] for i in self.stringOrder]
@@ -234,6 +237,20 @@ class MGui(QWidget):
         self.stringToDisplay = (str(self.stringName_s)+ '\n' + str(self.stringThrust_s) + '\n' + str(self.stringFlip_s))
         print(self.stringThrust_s)
         self.str_disp.setText(self.stringToDisplay)
+        
+        
+        with open("order.txt", "w") as ofile:
+            ofile.write(str(self.stringOrderNumbers))
+        with open("flip.txt", "w") as ffile:
+            ffile.write(str(self.stringFlip))
+
+
+        
+        #with open("order.txt", "r") as ofile:
+            #odata = eval(ofile.readline())
+        #with open("flip.txt", "r") as ffile:
+            #fdata = eval(ffile.readline())
+
 #---------------- beginning of main Gui class
 class Gui(QWidget):
     """
@@ -243,7 +260,28 @@ class Gui(QWidget):
         super(Gui, self).__init__()
 
         self.initUI()
-        self.motorWindow = MGui(self)
+        with open("order.txt", "r") as ofile:
+            odata = eval(ofile.readline())
+
+        Gui.fltO = odata[0]
+        Gui.frtO = odata[1]
+        Gui.bltO = odata[2]
+        Gui.brtO = odata[3]
+        Gui.ftO = odata[4]
+        Gui.btO = odata[5]
+
+        with open("flip.txt", "r") as ffile:
+            fdata = eval(ffile.readline())
+            
+        Gui.fltV = fdata[0]
+        Gui.frtV = fdata[1]
+        Gui.bltV = fdata[2]
+        Gui.brtV = fdata[3]
+        Gui.ftV = fdata[4]
+        Gui.btV = fdata[5]
+
+
+        #self.motorWindow = MGui(self)
         
         self.frontend = ROV("127.0.0.1", 8000)
 
@@ -293,7 +331,6 @@ class Gui(QWidget):
         self.video_frame1.setMaximumSize(8*90, 6*90)          #640, 480; 8:6
         self.video_frame2.setMaximumSize(8*90, 6*90)
 
-
         self.icon1 = colour_box("255, 0, 0")           #format is ("r, g, b")
         self.icon2 = colour_box("255, 0, 0")
         self.icon3 = colour_box("255, 0, 0")
@@ -312,6 +349,9 @@ class Gui(QWidget):
         
         self.motor_debug_btn = QPushButton('MOTOR DEBUG')
         self.motor_debug_btn.clicked.connect(self.on_motor_btn_clicked)
+
+        self.length_det_btn = QPushButton('Length Detection Enable')
+        self.length_det_btn.clicked.connect(self.screenshot_and_length)        
 
         self.cam_slider1 = QSlider()
         self.cam_slider1.setRange(0, 5)
@@ -354,6 +394,7 @@ class Gui(QWidget):
         grid.addWidget(self.IMUy_lbl, 13, 1)
         grid.addWidget(self.IMUy_reading, 13, 2)
         grid.addWidget(self.motor_debug_btn, 12, 4)
+        grid.addWidget(self.length_det_btn, 13, 5)
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 200, 600, 300)
@@ -362,7 +403,11 @@ class Gui(QWidget):
 
     def on_motor_btn_clicked(self):
         self.motorWindow = MGui(self)
-    
+
+    def screenshot_and_length(self):
+        cv2.imwrite("test1.png", self.video1.currentFrame)
+        self.detect_length = UndistortAND_Distance_Detection.Example()
+
     def on_slider1_changed(self):
         CAM1 = self.cam_slider1.value()
         self.frontend.set_selected_cameras(CAM1, CAM2)
@@ -464,18 +509,18 @@ DB
             self.side_factor = 200 * self.power
             
         self.fwd_left_thruster = int(
-            1500 - (self.motorWindow.fltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
+            1500 - (self.fltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
         self.fwd_right_thruster = int(
-            1500 + (self.motorWindow.frtV)*(self.fwd_factor * self.Y_Axis + self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
+            1500 + (self.frtV)*(self.fwd_factor * self.Y_Axis + self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
         self.bck_left_thruster = int(
-            1500 - (self.motorWindow.bltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
+            1500 - (self.bltV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
         self.bck_right_thruster = int(
-            1500 + (self.motorWindow.brtV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
+            1500 + (self.brtV)*(self.fwd_factor * self.Y_Axis - self.side_factor * self.X_Axis + self.yaw_factor * self.Yaw))
 
 
         # To go up/down
-        self.front_thruster = int(1500 + (self.motorWindow.ftV)*(self.fwd_factor * self.Rudder))
-        self.back_thruster = int(1500 + (self.motorWindow.btV)*(self.fwd_factor * self.Rudder))
+        self.front_thruster = int(1500 + (self.ftV)*(self.fwd_factor * self.Rudder))
+        self.back_thruster = int(1500 + (self.btV)*(self.fwd_factor * self.Rudder))
 
         # ------Pitching code------
         """
@@ -483,8 +528,8 @@ DB
         the above 2 lines and moves the thrusters in oppsite directions in order to pitch as required.
         """
         if(self.Throttle>0.1 or self.Throttle<-0.1):
-            self.front_thruster = int(1500 - (self.motorWindow.ftV)*(self.fwd_factor * self.Throttle))
-            self.back_thruster = int(1500 - (self.motorWindow.btV)*(self.fwd_factor * self.Throttle))
+            self.front_thruster = int(1500 - (self.ftV)*(self.fwd_factor * self.Throttle))
+            self.back_thruster = int(1500 - (self.btV)*(self.fwd_factor * self.Throttle))
 
 
         # ================================ Manipulators ================================
@@ -562,9 +607,13 @@ DB
                 AXIS = 1
                 self.frontend.set_axis_stable(1)
         
+        with open("order.txt", "r") as ofile:
+            order_data = eval(ofile.readline())
+            
         thruster_string = [self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
                            self.bck_right_thruster, self.back_thruster, self.bck_left_thruster]
-        self.frontend.set_thrusts(thruster_string)
+        self.thruster_string_ordered = [thruster_string[i-1] for i in order_data]
+        self.frontend.set_thrusts(self.thruster_string_ordered)
         #print(thruster_string)
 
 

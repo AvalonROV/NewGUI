@@ -65,9 +65,12 @@ class Gui(QWidget):
         imu_y_lbl = QLabel('IMU y Value:')
         self.imu_x = QLineEdit()
         self.imu_y = QLineEdit()
-        depth_lbl = QLabel('Depth Reading:')
+        depth_lbl = QLabel('Respective Depth Reading:')
         self.depth = QLineEdit()
         self.depth.setText('0')
+        rec_depth_lbl = QLabel('Recorded Depth Reading:')
+        self.rec_depth = QLineEdit()
+        self.rec_depth.setText('0')        
         depth_record_btn = QPushButton('Record Depth')
         depth_record_btn.clicked.connect(self.calculate_depth)
         
@@ -142,7 +145,7 @@ class Gui(QWidget):
         p_calc.addWidget(blank, 15, 1)
         p_calc.addWidget(depth_record_btn, 17, 1)
         p_calc.addWidget(depth_lbl, 18, 1); p_calc.addWidget(self.depth, 18, 2)
-        p_calc.addWidget(blank, 19, 3)
+        p_calc.addWidget(rec_depth_lbl, 19, 1); p_calc.addWidget(self.rec_depth, 19, 2)
         
         # create calculating location layout container        
         loc_calc = QGridLayout()
@@ -284,6 +287,7 @@ class Gui(QWidget):
         recorded_depth = float(self.frontend.get_depth())
         current_depth = self.frontend.get_depth() - recorded_depth
         self.depth.setText(str(current_depth))
+        self.rec_depth.setText(str(recorded_depth))
 
 def main():
 
