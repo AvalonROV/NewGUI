@@ -283,7 +283,7 @@ class Gui(QWidget):
 
         #self.motorWindow = MGui(self)
         
-        self.frontend = ROV("127.0.0.1", 8000)
+        self.frontend = ROV("192.168.1.5", 8000)
 
         self.string_formatter()
         # ------THREADING-----#

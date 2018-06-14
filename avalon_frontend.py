@@ -23,6 +23,8 @@ import converttobinary as ctb    #Module that handles conversion of Python Value
 #CLASSES
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #The class that performs the main control functions with the ROV
+rov_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #Specifies Internet and UDP Communication to the Socket Class
+        
 class ROV():
     """
     A class used to facilitate communications with the Avalon ROV. UDP Communication is used via an Ethernet Interface to
@@ -78,7 +80,6 @@ class ROV():
         print ("Target Port: " + str(rov_port))
         
         #Connecting to the ROV
-        self.rov_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #Specifies Internet and UDP Communication to the Socket Class
         #self.rov_socket.bind((rov_ip, rov_port))
         
         #Performing a test communication with the ROV
@@ -95,7 +96,7 @@ class ROV():
         OUTPUTS: NONE
         """
         #print(message)
-        self.rov_socket.sendto(message, (self.ip_address, self.port))
+        rov_socket.sendto(message, (self.ip_address, self.port))
     
     #Method used to recieve a message via UDP from the ROV
     def recieve_message(self):
