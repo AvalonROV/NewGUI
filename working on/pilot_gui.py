@@ -19,6 +19,8 @@ from time import sleep
 from avalon_frontend import ROV
 import converttobinary
 import UndistortAND_Distance_Detection
+import os
+
 
 
 """
@@ -297,8 +299,8 @@ class Gui(QWidget):
         self.thread.start() #Start the thread
 
         #video 
-        self.video1 = Video(cv2.VideoCapture(0))        #an object of class Video(argument)
-        self.video2 = Video(cv2.VideoCapture(0))        #edit integer to change feed source, 0 is webcam, 1 is videograbber
+        self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))        #an object of class Video(argument)
+        self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.play1)
         self._timer.timeout.connect(self.play2)
@@ -351,15 +353,18 @@ class Gui(QWidget):
         self.motor_debug_btn.clicked.connect(self.on_motor_btn_clicked)
 
         self.length_det_btn = QPushButton('Length Detection Enable')
-        self.length_det_btn.clicked.connect(self.screenshot_and_length)        
+        self.length_det_btn.clicked.connect(self.screenshot_and_length)
+        self.tail_det_btn = QPushButton('Tail Detection Enable')
+        self.tail_det_btn.clicked.connect(self.tail_det)
 
         self.cam_slider1 = QSlider()
-        self.cam_slider1.setRange(0, 5)
+        self.cam_slider1.setRange(0, 3)
         self.cam_slider1.setTickPosition(0) #sets tick position to either side of the slider
         self.cam_slider1.valueChanged.connect(self.on_slider1_changed)
         self.cam_slider2 = QSlider()
-        self.cam_slider2.setRange(0, 5)
+        self.cam_slider2.setRange(0, 3)
         self.cam_slider2.setTickPosition(0)
+        self.cam_slider2.setSliderPosition(1)
         self.cam_slider2.valueChanged.connect(self.on_slider2_changed)
         
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
@@ -395,6 +400,7 @@ class Gui(QWidget):
         grid.addWidget(self.IMUy_reading, 13, 2)
         grid.addWidget(self.motor_debug_btn, 12, 4)
         grid.addWidget(self.length_det_btn, 13, 5)
+        grid.addWidget(self.tail_det_btn, 12, 5)
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 200, 600, 300)
@@ -408,15 +414,44 @@ class Gui(QWidget):
         cv2.imwrite("test1.png", self.video1.currentFrame)
         self.detect_length = UndistortAND_Distance_Detection.Example()
 
-    def on_slider1_changed(self):
-        CAM1 = self.cam_slider1.value()
-        self.frontend.set_selected_cameras(CAM1, CAM2)
-        #self.frontend.set_selected_cameras(self.cam_slider1.value(),self.cam_slider2.value())
+    def tail_det(self):
+        #os.system("PATH OF FILE")
+        # need to test and add path of C++ file
+        pass
 
+    def on_slider1_changed(self):
+        if (self.cam_slider1.value() ==0):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))
+        if (self.cam_slider1.value() ==1):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
+        if (self.cam_slider1.value() ==2):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8083"))
+        if (self.cam_slider1.value() ==3):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8084"))
+        if (self.cam_slider1.value() ==4):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8085"))
+        else:
+            pass
+        #self._timer = QTimer(self)
+        self._timer.timeout.connect(self.play1)
+        #self._timer.start(27)
+    
     def on_slider2_changed(self):
-        CAM2 = self.cam_slider2.value()
-        self.frontend.set_selected_cameras(CAM1, CAM2)
-        #self.frontend.set_selected_cameras(self.cam_slider1.value(), self.cam_slider2.value())
+        if (self.cam_slider2.value() ==0):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))
+        if (self.cam_slider2.value() ==1):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
+        if (self.cam_slider2.value() ==2):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8083"))
+        if (self.cam_slider2.value() ==3):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8084"))
+        if (self.cam_slider2.value() ==4):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8085"))
+        else:
+            pass
+        #self._timer = QTimer(self)
+        self._timer.timeout.connect(self.play2)
+        self._timer.start(27)
         
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
