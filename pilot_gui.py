@@ -250,12 +250,6 @@ class MGui(QWidget):
             ffile.write(str(self.stringFlip))
 
 
-        
-        #with open("order.txt", "r") as ofile:
-            #odata = eval(ofile.readline())
-        #with open("flip.txt", "r") as ffile:
-            #fdata = eval(ffile.readline())
-
 #---------------- beginning of main Gui class
 class Gui(QWidget):
     """
@@ -288,7 +282,7 @@ class Gui(QWidget):
 
         #self.motorWindow = MGui(self)
         
-        self.frontend = ROV("192.168.1.101", 8000)
+        self.frontend = ROV("127.0.0.1", 8000)
 
         self.string_formatter()
         # ------THREADING-----#
@@ -340,10 +334,12 @@ class Gui(QWidget):
         self.icon2 = colour_box("255, 0, 0")
         self.icon3 = colour_box("255, 0, 0")
         self.icon4 = colour_box("255, 0, 0")
-        self.indicator1 = QLabel('Inflating lifting bag 1')
+        self.icon5 = colour_box("255, 0, 0")
+        self.indicator1 = QLabel('Inflating lifting bag')
         self.indicator2 = QLabel('Detaching lifting bag 1 Magnet')
         self.indicator3 = QLabel('Detaching lifting bag 2 Magnet')
-        self.indicator4 = QLabel('Detaching lifting bag 1')
+        self.indicator4 = QLabel('Grabber enabled?')
+        self.indicator5 = QLabel('Levelling motor')
         
         self.depth_lbl = QLabel('Depth Reading:')
         self.IMUx_lbl = QLabel('IMU X Value')
@@ -351,6 +347,7 @@ class Gui(QWidget):
         self.depth_reading = QLineEdit()
         self.IMUx_reading = QLineEdit()
         self.IMUy_reading = QLineEdit()
+        self.IMU_txt = QTextEdit()
         
         self.motor_debug_btn = QPushButton('MOTOR DEBUG')
         self.motor_debug_btn.clicked.connect(self.on_motor_btn_clicked)
@@ -389,16 +386,20 @@ class Gui(QWidget):
         grid.addWidget(self.indicator2, 7, 1, 1, 1)
         grid.addWidget(self.indicator3, 8, 1, 1, 1)
         grid.addWidget(self.indicator4, 9, 1, 1, 1)
+        grid.addWidget(self.indicator5, 10, 1, 1, 1)
         grid.addWidget(self.icon1, 6, 2)
         grid.addWidget(self.icon2, 7, 2)
         grid.addWidget(self.icon3, 8, 2)
         grid.addWidget(self.icon4, 9, 2)
+        grid.addWidget(self.icon5, 10, 2)
         grid.addWidget(self.depth_lbl, 11, 1)
         grid.addWidget(self.depth_reading, 11, 2)
         grid.addWidget(self.IMUx_lbl, 12, 1)
         grid.addWidget(self.IMUx_reading, 12, 2)
         grid.addWidget(self.IMUy_lbl, 13, 1)
         grid.addWidget(self.IMUy_reading, 13, 2)
+        grid.addWidget(self.IMU_txt, 9, 4, 2, 2)
+
         grid.addWidget(self.motor_debug_btn, 12, 4)
         grid.addWidget(self.length_det_btn, 13, 5)
         self.setLayout(grid)    #Set the layout
@@ -484,16 +485,16 @@ DB
         self.Throttle = my_joystick.get_axis(2)
         self.Yaw = my_joystick.get_axis(3)
         self.Rudder = my_joystick.get_axis(4)
-        self.LEVELM_button = my_joystick.get_button(0)  # Button 1
-        self.two_button = my_joystick.get_button(1)  # Button 2
-        self.DB1_button = my_joystick.get_button(2)  # Button 3
-        self.LB1_button = my_joystick.get_button(4)  # Button 5
-        self.EM1_button = my_joystick.get_button(5)  # Button 6
-        self.DB2_button = my_joystick.get_button(6)  # Button 7
+        self.one_button = my_joystick.get_button(0)  # Button 1
+        self.GRAB_button = my_joystick.get_button(1)  # Button 2
+        self.three_button = my_joystick.get_button(2)  # Button 3
+        self.EM1_button = my_joystick.get_button(4)  # Button 5
+        self.EM2_button = my_joystick.get_button(5)  # Button 6
+        self.LB1_button = my_joystick.get_button(6)  # Button 7
         self.SE_button = my_joystick.get_button(10)  # Button SE
         self.ST_button = my_joystick.get_button(11)  # Button ST
-        self.EM2_button = my_joystick.get_button(7)  # Button 8
-        self.GRAB_button = my_joystick.get_button(3)  # Button 4, L3
+        self.LEVELM_button = my_joystick.get_button(7)  # Button 8
+        self.four_button = my_joystick.get_button(3)  # Button 4, L3
 
 
         # Initital values
@@ -571,87 +572,77 @@ DB
 
         # LB1
         if (self.LB1_button == 1):
-            sleep(0.2)
-            if (LB1 == 1):
-                LB1 = 0
-                self.frontend.set_lift_bag_inflate(0)
-                self.icon1.change_colour("0, 255, 0")
-            else:
-                LB1 = 1
-                self.frontend.set_lift_bag_inflate(1)
-                self.icon1.change_colour("0, 255, 0")
+            self.frontend.set_lift_bag_inflate(1)
+            self.icon1.change_colour("255, 0, 0")
+        else:
+            LB1 = 0
+            self.frontend.set_lift_bag_inflate(0)
+            self.icon1.change_colour("0, 255, 0")
 
 
         # EM1
         if (self.EM1_button == 1):
-            sleep(0.2)
-            if (EM1 == 1):
-                EM1 = 0
-                self.frontend.set_lift_bag_EM_release(EM1, 0)
-                self.icon2.change_colour("255, 0, 0")
-            else:
-                EM1 = 1
-                self.frontend.set_lift_bag_EM_release(EM1, 0)
-                self.icon2.change_colour("0, 255, 0")
+            EM1 = 1
+            self.frontend.set_lift_bag_EM_release(EM1, 0)
+            self.icon2.change_colour("255, 0, 0")
+        else:
+            EM1 = 0
+            self.frontend.set_lift_bag_EM_release(EM1, 0)
+            self.icon2.change_colour("0, 255, 0")
 
 
         # EM2
         if (self.EM2_button == 1):
-            sleep(0.2)
-            if (EM2 == 0):
-                EM2 = 1
-                self.frontend.set_lift_bag_EM_release(EM2, 1)
-                self.icon3.change_colour("255, 0, 0")
-            else:
-                EM2 = 0
-                self.frontend.set_lift_bag_EM_release(EM2, 1)
-                self.icon3.change_colour("0, 255, 0")
+            EM2 = 1
+            self.frontend.set_lift_bag_EM_release(EM2, 1)
+            self.icon3.change_colour("255, 0, 0")
+        else:
+            EM2 = 0
+            self.frontend.set_lift_bag_EM_release(EM2, 1)
+            self.icon3.change_colour("0, 255, 0")
 
 
-        # DB1
-        if (self.DB1_button == 1):
-            sleep(0.2)
-            if (DB1 == 1):
-                DB1 = 0
-                self.frontend.set_lift_bag_release(DB1, 0)
-                self.icon4.change_colour("255, 0, 0")
-            else:
-                DB1 = 1
-                self.frontend.set_lift_bag_release(DB1, 0)
-                self.icon4.change_colour("0, 255, 0")
-
-        # DB2
-        if (self.DB2_button == 1):
-            sleep(0.2)
-            if (DB2 == 1):
-                DB2 = 0
-                self.frontend.set_lift_bag_release(DB2, 1)
-                # self.icon5.change_colour("255, 0, 0")
-            else:
-                DB2 = 1
-                self.frontend.set_lift_bag_release(DB2, 1)
-                # self.icon5.change_colour("0, 255, 0")
+        # # DB1
+        # if (self.DB1_button == 1):
+        #     DB1 = 0
+        #     self.frontend.set_lift_bag_release(DB1, 0)
+        #     self.icon4.change_colour("255, 0, 0")
+        # else:
+        #     DB1 = 1
+        #     self.frontend.set_lift_bag_release(DB1, 0)
+        #     self.icon4.change_colour("0, 255, 0")
+        #
+        # # DB2
+        # if (self.DB2_button == 1):
+        #     DB2 = 0
+        #     self.frontend.set_lift_bag_release(DB2, 1)
+        #     self.icon5.change_colour("255, 0, 0")
+        # else:
+        #     DB2 = 1
+        #     self.frontend.set_lift_bag_release(DB2, 1)
+        #     self.icon5.change_colour("0, 255, 0")
 
         # GRAB
         if (self.GRAB_button == 1):
-            sleep(0.2)
-            if (GRAB == 0):
-                GRAB = 1
-                self.frontend.set_grabber_position(0)
-            else:
-                GRAB = 1
-                self.frontend.set_grabber_position(1)
+            GRAB = 1
+            self.frontend.set_grabber_position(1)
+            self.icon4.change_colour("255, 0, 0")
+        else:
+            GRAB = 0
+            self.frontend.set_grabber_position(0)
+            self.icon4.change_colour("0, 255, 0")
 
 
         # LEVELM
         if (self.LEVELM_button == 1):
-            sleep(0.2)
-            if (LEVELM == 0):
-                LEVELM = 1
-                self.frontend.set_levelling_motor_rotation(1)
-            else:
-                LEVELM = 0
-                self.frontend.set_levelling_motor_rotation(0)
+            LEVELM = 1
+            self.frontend.set_levelling_motor_rotation(1)
+            self.icon5.change_colour("255, 0, 0")
+        else:
+            LEVELM = 0
+            self.frontend.set_levelling_motor_rotation(0)
+            self.icon5.change_colour("0, 255, 0")
+
 
         with open("order.txt", "r") as ofile:
             order_data = eval(ofile.readline())
@@ -671,12 +662,17 @@ DB
         number_axes = my_joystick.get_numaxes()  # Collects the pre-defined number of axis
         number_buttons = my_joystick.get_numbuttons()  # Collects the pre-defined number of buttons
 
+
         try:    # Read data from the ROV
-            self.frontend.recieve_parameters()
-            #recieved_string = recieve_socket.recv(1024).decode()
-            #self.complete_recieved_string += recieved_string + '\n'
-            #self.recieved_string_txtbox.setText(self.complete_recieved_string)
+            var = self.frontend.recieve_message().decode()
+            if (var[0] == 'w'):
+                self.IMU_txt.setText(var[1:])
+            if (var[0] == 'd'):
+                self.depth_reading.setText(str(var[1:]))
+            else:
+                print(var)
         except:
+            print("pass")
             pass
 
         self.string_formatter()  # Calling the thruster value

@@ -34,6 +34,7 @@ class Gui(QWidget):
         graph_task.setStyleSheet(" font: bold; qproperty-alignment: AlignCenter")
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
+        self.plot_txt = QLineEdit()
         self.button = QPushButton('Plot')
         self.button.clicked.connect(self.plot)
         
@@ -124,6 +125,7 @@ class Gui(QWidget):
         graph = QVBoxLayout()
         graph.addWidget(graph_task)
         graph.addWidget(self.canvas)
+        graph.addWidget(self.plot_txt)
         graph.addWidget(self.button)        
         
         # create centre layout container        
@@ -192,7 +194,7 @@ class Gui(QWidget):
 
     def plot(self):
         #plot some random stuff 
-        OBS_points = self.frontend.get_imu()
+        OBS_points = eval(self.plot_txt.text())
 
         # create an axis
         ax = self.figure.add_subplot(111)

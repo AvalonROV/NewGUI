@@ -26,6 +26,10 @@ import converttobinary as ctb  # Module that handles conversion of Python Values
 rov_socket = socket.socket(socket.AF_INET,
                            socket.SOCK_DGRAM)  # Specifies Internet and UDP Communication to the Socket Class
 
+recieve_port = 12345
+recieve_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+recieve_socket.bind(("", recieve_port))
+recieve_socket.setblocking(0)
 
 class ROV():
     """
@@ -83,7 +87,7 @@ class ROV():
         print("Target Port: " + str(rov_port))
 
         # Connecting to the ROV
-        # self.rov_socket.bind((rov_ip, rov_port))
+        #rov_socket.bind((rov_ip, rov_port))
 
         # Performing a test communication with the ROV
 
@@ -108,7 +112,7 @@ class ROV():
         INPUTS: NONE
         OUTPUTS: The message sent by the ROV as a string
         """
-        message = self.rov_socket.recv(self.com_buff_size)
+        message = recieve_socket.recv(self.com_buff_size)
         return message
 
     # Method used to perform the Send communication cycle with the ROV
@@ -123,9 +127,9 @@ class ROV():
 
         message_string = ""
 
-        message_list = self.thrust_vals + self.release_mechanism_states + self.EM_release_mechanism_states + \
-                       self.inflate_mechanism_state + self.grabber_val + self.levelling_motor_flag
-
+        message_list = self.thrust_vals + self.grabber_val + self.inflate_mechanism_state + \
+                       self.EM_release_mechanism_states + self.levelling_motor_flag
+        # self.release_mechanism_states is not needed but commented here in case
         '''
         #Encoding and Appending Thruster Values to message string
         message_string += str(self.thrust_vals)
@@ -162,10 +166,10 @@ class ROV():
         OUTPUTS: Outputs 1 if the Recieve Cycle completes successfully, Outputs 0 if the Recieve Cycle fails
         """
         # Recieving the latest data from the ROV
-        message_string = self.recieve_message()
+        self.message_string_rec = self.recieve_message()
 
         # Decoding the IMU Values from the Message String
-        self.decode_imu_vals(message_string[0:48])
+        #self.decode_imu_vals(message_string_rec[0:48])
 
     # Method used to perform the full communication cycle with the ROV
     def communicate(self):
