@@ -33,8 +33,13 @@ clock = pygame.time.Clock() # Create a clock object to track time
 app = QApplication(sys.argv) # Creat a new QApplication object. This manages
                                 # the GUI application's control flow and main
                                 # settings.
-CAM1 = 0
-CAM2 = 0
+LB1 = 0
+DB1 = 0
+DB2 = 0
+GRAB = 0
+EM1 = 0
+EM2 = 0
+LEVELM = 0
 
 class MGui(QWidget):
 #base class of all user interface objects. 
@@ -283,7 +288,7 @@ class Gui(QWidget):
 
         #self.motorWindow = MGui(self)
         
-        self.frontend = ROV("192.168.1.5", 8000)
+        self.frontend = ROV("192.168.1.101", 8000)
 
         self.string_formatter()
         # ------THREADING-----#
@@ -297,8 +302,8 @@ class Gui(QWidget):
         self.thread.start() #Start the thread
 
         #video 
-        self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))        #an object of class Video(argument)
-        self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
+        self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))        #an object of class Video(argument)
+        self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.play1)
         self._timer.timeout.connect(self.play2)
@@ -411,15 +416,15 @@ class Gui(QWidget):
 
     def on_slider1_changed(self):
         if (self.cam_slider1.value() ==0):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))
         if (self.cam_slider1.value() ==1):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
         if (self.cam_slider1.value() ==2):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8083"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8083"))
         if (self.cam_slider1.value() ==3):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8084"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8084"))
         if (self.cam_slider1.value() ==4):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.2:8085"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8085"))
         else:
             pass
         #self._timer = QTimer(self)
@@ -428,15 +433,15 @@ class Gui(QWidget):
     
     def on_slider2_changed(self):
         if (self.cam_slider2.value() ==0):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8081"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))
         if (self.cam_slider2.value() ==1):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8082"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
         if (self.cam_slider2.value() ==2):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8083"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8083"))
         if (self.cam_slider2.value() ==3):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8084"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8084"))
         if (self.cam_slider2.value() ==4):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.2:8085"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8085"))
         else:
             pass
         #self._timer = QTimer(self)
@@ -479,27 +484,32 @@ DB
         self.Throttle = my_joystick.get_axis(2)
         self.Yaw = my_joystick.get_axis(3)
         self.Rudder = my_joystick.get_axis(4)
-        self.one_button = my_joystick.get_button(0)  # Button 1
+        self.LEVELM_button = my_joystick.get_button(0)  # Button 1
         self.two_button = my_joystick.get_button(1)  # Button 2
         self.DB1_button = my_joystick.get_button(2)  # Button 3
         self.LB1_button = my_joystick.get_button(4)  # Button 5
         self.EM1_button = my_joystick.get_button(5)  # Button 6
-        self.EM2_button = my_joystick.get_button(6)  # Button 7
+        self.DB2_button = my_joystick.get_button(6)  # Button 7
         self.SE_button = my_joystick.get_button(10)  # Button SE
         self.ST_button = my_joystick.get_button(11)  # Button ST
-        self.AXIS_button = my_joystick.get_button(7)  # Button 8
+        self.EM2_button = my_joystick.get_button(7)  # Button 8
         self.GRAB_button = my_joystick.get_button(3)  # Button 4, L3
 
 
         # Initital values
         # blah like self.funnel = 0 or global LB1
-        self.LB1 = 0
-        self.DB1 = 0
-        self.GRAB = 0
-        self.EM1 = 0
-        self.EM2 = 0
-        global CAM1
-        global CAM2
+        # self.LB1 = 0
+        # self.DB1 = 0
+        # self.GRAB = 0
+        # self.EM1 = 0
+        # self.EM2 = 0
+        global LB1
+        global DB1
+        global DB2
+        global GRAB
+        global EM1
+        global EM2
+        global LEVELM
 
         # ================================ Thrusters Power ================================
         """
@@ -577,24 +587,24 @@ DB
             sleep(0.2)
             if (EM1 == 1):
                 EM1 = 0
-                self.frontend.set_lift_bag_release(0)
+                self.frontend.set_lift_bag_EM_release(EM1, 0)
                 self.icon2.change_colour("255, 0, 0")
             else:
                 EM1 = 1
-                self.frontend.set_lift_bag_release(1)
+                self.frontend.set_lift_bag_EM_release(EM1, 0)
                 self.icon2.change_colour("0, 255, 0")
 
 
         # EM2
         if (self.EM2_button == 1):
             sleep(0.2)
-            if (EM3 == 1):
-                EM3 = 0
-                self.frontend.set_lift_bag_release(0)
+            if (EM2 == 0):
+                EM2 = 1
+                self.frontend.set_lift_bag_EM_release(EM2, 1)
                 self.icon3.change_colour("255, 0, 0")
             else:
-                EM2 = 1
-                self.frontend.set_lift_bag_release(1)
+                EM2 = 0
+                self.frontend.set_lift_bag_EM_release(EM2, 1)
                 self.icon3.change_colour("0, 255, 0")
 
 
@@ -603,35 +613,46 @@ DB
             sleep(0.2)
             if (DB1 == 1):
                 DB1 = 0
-                self.frontend.set_lift_bag_release(0)
+                self.frontend.set_lift_bag_release(DB1, 0)
                 self.icon4.change_colour("255, 0, 0")
             else:
                 DB1 = 1
-                self.frontend.set_lift_bag_release(1)
+                self.frontend.set_lift_bag_release(DB1, 0)
                 self.icon4.change_colour("0, 255, 0")
 
+        # DB2
+        if (self.DB2_button == 1):
+            sleep(0.2)
+            if (DB2 == 1):
+                DB2 = 0
+                self.frontend.set_lift_bag_release(DB2, 1)
+                # self.icon5.change_colour("255, 0, 0")
+            else:
+                DB2 = 1
+                self.frontend.set_lift_bag_release(DB2, 1)
+                # self.icon5.change_colour("0, 255, 0")
 
         # GRAB
         if (self.GRAB_button == 1):
             sleep(0.2)
-            if (GRAB == 1):
-                GRAB = 0
+            if (GRAB == 0):
+                GRAB = 1
                 self.frontend.set_grabber_position(0)
             else:
                 GRAB = 1
                 self.frontend.set_grabber_position(1)
 
 
-        # AXIS
-        if (self.AXIS_button == 1):
+        # LEVELM
+        if (self.LEVELM_button == 1):
             sleep(0.2)
-            if (AXIS == 1):
-                AXIS = 0
-                self.frontend.set_axis_stable(0)
+            if (LEVELM == 0):
+                LEVELM = 1
+                self.frontend.set_levelling_motor_rotation(1)
             else:
-                AXIS = 1
-                self.frontend.set_axis_stable(1)
-        
+                LEVELM = 0
+                self.frontend.set_levelling_motor_rotation(0)
+
         with open("order.txt", "r") as ofile:
             order_data = eval(ofile.readline())
             
@@ -659,7 +680,7 @@ DB
             pass
 
         self.string_formatter()  # Calling the thruster value
-        self.frontend.send_settings()   
+        self.frontend.send_settings()   # send settings including parameters
         self.set_values()
         
     def set_values(self):
