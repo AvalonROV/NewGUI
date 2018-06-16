@@ -41,7 +41,7 @@ class ROV():
     
     """
     # Communication Definitions
-    com_buff_size = 1024  # The size of the buffer used to recieve message from the ROV
+    com_buff_size = 1024 # The size of the buffer used to recieve message from the ROV
 
     # Thruster Parameters
     thrust_vals = [0, 0, 0, 0, 0, 0]  # A List containing the raw values for each thruster
@@ -112,7 +112,14 @@ class ROV():
         INPUTS: NONE
         OUTPUTS: The message sent by the ROV as a string
         """
+        message = ""
         message = recieve_socket.recv(self.com_buff_size)
+        
+        return message
+
+
+    def clear_message(self):
+        message = ""
         return message
 
     # Method used to perform the Send communication cycle with the ROV

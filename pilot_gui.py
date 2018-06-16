@@ -282,7 +282,7 @@ class Gui(QWidget):
 
         #self.motorWindow = MGui(self)
         
-        self.frontend = ROV("127.0.0.1", 8000)
+        self.frontend = ROV("192.168.1.4", 8000)
 
         self.string_formatter()
         # ------THREADING-----#
@@ -297,7 +297,7 @@ class Gui(QWidget):
 
         #video 
         self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))        #an object of class Video(argument)
-        self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
+        self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.play1)
         self._timer.timeout.connect(self.play2)
@@ -311,7 +311,8 @@ class Gui(QWidget):
                 self.video1.convertFrame())
             self.video_frame1.setScaledContents(True)
         except TypeError:
-            print("No frame")
+            pass
+            #print("No frame")
 
     def play2(self):
         try:
@@ -320,7 +321,8 @@ class Gui(QWidget):
                 self.video2.convertFrame())
             self.video_frame2.setScaledContents(True)
         except TypeError:
-            print("No frame")
+            pass
+            #print("No frame")
 
     def initUI(self):
 
@@ -344,26 +346,30 @@ class Gui(QWidget):
         self.depth_lbl = QLabel('Depth Reading:')
         self.IMUx_lbl = QLabel('IMU X Value')
         self.IMUy_lbl = QLabel('IMU Y Value')        
-        self.depth_reading = QLineEdit()
+        self.depth_reading = QTextEdit()
         self.IMUx_reading = QLineEdit()
         self.IMUy_reading = QLineEdit()
+        #self.IMU_txt_lbl = 
         self.IMU_txt = QTextEdit()
         
         self.motor_debug_btn = QPushButton('MOTOR DEBUG')
         self.motor_debug_btn.clicked.connect(self.on_motor_btn_clicked)
 
         self.length_det_btn = QPushButton('Length Detection Enable')
-        self.length_det_btn.clicked.connect(self.screenshot_and_length)        
+        self.length_det_btn.clicked.connect(self.screenshot_and_length)
+
+        self.tail_det_btn = QPushButton('Tail Detection Enable')
+        self.tail_det_btn.clicked.connect(self.tail_det)        
 
         self.cam_slider1 = QSlider()
-        self.cam_slider1.setRange(0, 4)
+        self.cam_slider1.setRange(0, 2)
         self.cam_slider1.setTickPosition(0) #sets tick position to either side of the slider
         self.cam_slider1.valueChanged.connect(self.on_slider1_changed)
         self.cam_slider2 = QSlider()
-        self.cam_slider2.setRange(0, 4)
+        self.cam_slider2.setRange(0, 2)
         self.cam_slider2.setTickPosition(0)
-        self.cam_slider2.setSliderPosition(1)
         self.cam_slider2.valueChanged.connect(self.on_slider2_changed)
+        self.cam_slider2.setStyle
         
         self.recieved_string_label = QLabel()   #Create label for the text received from the ROV
         self.recieved_string_label.setText("String Recieved from ROV")  #Set Text
@@ -398,10 +404,11 @@ class Gui(QWidget):
         grid.addWidget(self.IMUx_reading, 12, 2)
         grid.addWidget(self.IMUy_lbl, 13, 1)
         grid.addWidget(self.IMUy_reading, 13, 2)
-        grid.addWidget(self.IMU_txt, 9, 4, 2, 2)
+        grid.addWidget(self.IMU_txt, 6, 4, 5, 2)
 
         grid.addWidget(self.motor_debug_btn, 12, 4)
-        grid.addWidget(self.length_det_btn, 13, 5)
+        grid.addWidget(self.length_det_btn, 13, 4)
+        grid.addWidget(self.tail_det_btn, 13, 5)    
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 200, 600, 300)
@@ -415,6 +422,11 @@ class Gui(QWidget):
         cv2.imwrite("test1.png", self.video1.currentFrame)
         self.detect_length = UndistortAND_Distance_Detection.Example()
 
+    def tail_det(self):
+        #os.system("PATH OF FILE")
+        # need to test and add path of C++ file
+        pass        
+
     def on_slider1_changed(self):
         if (self.cam_slider1.value() ==0):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))
@@ -422,10 +434,10 @@ class Gui(QWidget):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider1.value() ==2):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
-        if (self.cam_slider1.value() ==3):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
-        if (self.cam_slider1.value() ==4):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
+        #if (self.cam_slider1.value() ==3):
+            #self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
+        #if (self.cam_slider1.value() ==4):
+            #self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         else:
             pass
         #self._timer = QTimer(self)
@@ -439,10 +451,10 @@ class Gui(QWidget):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider2.value() ==2):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
-        if (self.cam_slider2.value() ==3):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
-        if (self.cam_slider2.value() ==4):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
+        #if (self.cam_slider2.value() ==3):
+            #self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
+        #if (self.cam_slider2.value() ==4):
+            #self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         else:
             pass
         #self._timer = QTimer(self)
@@ -487,13 +499,13 @@ DB
         self.Rudder = my_joystick.get_axis(4)
         self.one_button = my_joystick.get_button(0)  # Button 1
         self.GRAB_button = my_joystick.get_button(1)  # Button 2
-        self.three_button = my_joystick.get_button(2)  # Button 3
+        self.LEVELM2_button = my_joystick.get_button(2)  # Button 3
         self.EM1_button = my_joystick.get_button(4)  # Button 5
         self.EM2_button = my_joystick.get_button(5)  # Button 6
         self.LB1_button = my_joystick.get_button(6)  # Button 7
         self.SE_button = my_joystick.get_button(10)  # Button SE
         self.ST_button = my_joystick.get_button(11)  # Button ST
-        self.LEVELM_button = my_joystick.get_button(7)  # Button 8
+        self.LEVELM1_button = my_joystick.get_button(7)  # Button 8
         self.four_button = my_joystick.get_button(3)  # Button 4, L3
 
 
@@ -633,12 +645,16 @@ DB
             self.icon4.change_colour("0, 255, 0")
 
 
-        # LEVELM
-        if (self.LEVELM_button == 1):
+        # LEVELM1
+        if (self.LEVELM1_button == 1):
             LEVELM = 1
             self.frontend.set_levelling_motor_rotation(1)
             self.icon5.change_colour("255, 0, 0")
-        else:
+        if (self.LEVELM2_button == 1):
+            LEVELM = 2
+            self.frontend.set_levelling_motor_rotation(2)
+            self.icon5.change_colour("0, 0, 255")
+        elif (self.LEVELM1_button == 0 and self.LEVELM2_button == 0):
             LEVELM = 0
             self.frontend.set_levelling_motor_rotation(0)
             self.icon5.change_colour("0, 255, 0")
@@ -658,9 +674,9 @@ DB
         """
         This function reads parameters from the joystick and sends the formatted string to the ROV.
         """
-        name_joystick = my_joystick.get_name()  # Collects the pre-defined name of joystick
-        number_axes = my_joystick.get_numaxes()  # Collects the pre-defined number of axis
-        number_buttons = my_joystick.get_numbuttons()  # Collects the pre-defined number of buttons
+        #name_joystick = my_joystick.get_name()  # Collects the pre-defined name of joystick
+        #number_axes = my_joystick.get_numaxes()  # Collects the pre-defined number of axis
+        #number_buttons = my_joystick.get_numbuttons()  # Collects the pre-defined number of buttons
 
 
         try:    # Read data from the ROV
@@ -668,16 +684,19 @@ DB
             if (var[0] == 'w'):
                 self.IMU_txt.setText(var[1:])
             if (var[0] == 'd'):
-                self.depth_reading.setText(str(var[1:]))
+                self.depth
+                self.depth_reading.setText(var[1:])
             else:
                 print(var)
+            #self.IMU_txt.setText(var)
         except:
             print("pass")
             pass
+        #var = self.frontend.clear_message()
 
         self.string_formatter()  # Calling the thruster value
         self.frontend.send_settings()   # send settings including parameters
-        self.set_values()
+
         
     def set_values(self):
         self.depth_reading.setText(str(self.frontend.get_depth()))

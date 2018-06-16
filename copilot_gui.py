@@ -52,7 +52,7 @@ class Gui(QWidget):
         water_vel_lbl = QLabel('Velocity of Water (knots)')
         efficiency_lbl = QLabel('Efficiency of Turbines (%)')
         ans_lbl = QLabel('Answer - Maximum Power Generated (W)')
-        self.num_tb = QDoubleSpinBox(); self.num_tb.setRange(0, 30)
+        self.num_tb = QDoubleSpinBox(); self.num_tb.setRange(0, 30); self.num_tb.setValue(4)
         self.density = QDoubleSpinBox(); self.density.setDecimals(3); self.density.setValue(1.025)
         self.diameter = QDoubleSpinBox(); self.diameter.setRange(0, 50)
         self.water_vel = QDoubleSpinBox(); self.water_vel.setRange(0, 20)
@@ -108,16 +108,16 @@ class Gui(QWidget):
         self.desc_as = QDoubleSpinBox()
         self.desc_rate = QDoubleSpinBox(); self.desc_rate.setValue(1)
         self.w_dir = QDoubleSpinBox(); self.w_dir.setRange(0, 360)
-        self.w_eqn = QLineEdit(); self.w_eqn.setText('-(t/720)**2 + 25')
-        self.asc_dist_x = QDoubleSpinBox(); self.asc_dist_x.setRange(-10000, 10000)
-        self.asc_dist_y = QDoubleSpinBox(); self.asc_dist_y.setRange(-10000, 10000)
-        self.desc_dist_x = QDoubleSpinBox(); self.desc_dist_x.setRange(-10000, 10000)
-        self.desc_dist_y = QDoubleSpinBox(); self.desc_dist_y.setRange(-10000, 10000)
-        self.wind_dist_x = QDoubleSpinBox(); self.wind_dist_x.setRange(-10000, 10000)
-        self.wind_dist_y = QDoubleSpinBox(); self.wind_dist_y.setRange(-10000, 10000)
-        self.total_dist_x = QDoubleSpinBox(); self.total_dist_x.setRange(-10000, 10000)
-        self.total_dist_y = QDoubleSpinBox(); self.total_dist_y.setRange(-10000, 10000)
-        self.ans_dist = QDoubleSpinBox(); self.ans_dist.setRange(-10000, 10000)
+        self.w_eqn = QLineEdit(); self.w_eqn.setText('-(1/720)*(t**2) + 25')
+        self.asc_dist_x = QDoubleSpinBox(); self.asc_dist_x.setRange(-30000, 30000)
+        self.asc_dist_y = QDoubleSpinBox(); self.asc_dist_y.setRange(-30000, 30000)
+        self.desc_dist_x = QDoubleSpinBox(); self.desc_dist_x.setRange(-30000, 30000)
+        self.desc_dist_y = QDoubleSpinBox(); self.desc_dist_y.setRange(-30000, 30000)
+        self.wind_dist_x = QDoubleSpinBox(); self.wind_dist_x.setRange(-30000, 30000)
+        self.wind_dist_y = QDoubleSpinBox(); self.wind_dist_y.setRange(-30000, 30000)
+        self.total_dist_x = QDoubleSpinBox(); self.total_dist_x.setRange(-30000, 30000)
+        self.total_dist_y = QDoubleSpinBox(); self.total_dist_y.setRange(-30000, 30000)
+        self.ans_dist = QDoubleSpinBox(); self.ans_dist.setRange(-30000, 30000)
         self.ans_angle = QDoubleSpinBox(); self.ans_angle.setRange(-360, 360)
         self.ans_heading = QDoubleSpinBox(); self.ans_heading.setRange(-360, 360)
         
@@ -220,9 +220,10 @@ class Gui(QWidget):
         p = self.density.value()
         d = self.diameter.value()
         a = (d/2)**2 * math.pi
-        V = self.water_vel.value()  #either 463/900 or 33/64
+        print(a)
+        V = round((33/64)*(self.water_vel.value()), 1)  #either 463/900 or 33/64
         Cp = self.efficiency.value()
-        pwr= N/2 * p * a * (V*463/900)**3 * Cp/100
+        pwr= N/2 * p * a * (V)**3 * Cp/100
         self.p_ans.setValue(pwr)
         
     def calculate_loc(self):
@@ -268,6 +269,11 @@ class Gui(QWidget):
         elif totaly>0 and totalx==0:
             angle = 90            
         
+        heading_ans = 90-angle
+        if (heading_ans<0):
+            heading_ans_final = 360 + heading_ans
+        elif (heading_ans>=0):
+            heading_ans_final = heading_ans
         self.asc_dist_x.setValue(ax)
         self.asc_dist_y.setValue(ay)
         self.desc_dist_x.setValue(dx)
@@ -278,7 +284,7 @@ class Gui(QWidget):
         self.total_dist_y.setValue(totaly)
         self.ans_dist.setValue(dist)
         self.ans_angle.setValue(angle)
-        self.ans_heading.setValue(90 - angle)
+        self.ans_heading.setValue(heading_ans_final)
     
 
 
