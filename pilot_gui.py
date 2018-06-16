@@ -189,7 +189,7 @@ class MGui(QWidget):
         if (self.m6_val.value() == 1):
             self.m6_val.setValue(-1)
         elif (self.m6_val.value() == -1):
-            self.m6_val.setValue(1)   
+            self.m6_val.setValue(1)  
 
 
     def stringcode(self):
@@ -201,6 +201,14 @@ class MGui(QWidget):
         MGui.ftV = self.m5_val.value()
         MGui.btV = self.m6_val.value()
         
+        Gui.fltV = self.m1_val.value()
+        Gui.frtV = self.m2_val.value()
+        Gui.bltV = self.m3_val.value()
+        Gui.brtV = self.m4_val.value()
+        Gui.ftV = self.m5_val.value()
+        Gui.btV = self.m6_val.value()
+        
+
         self.flMag = self.m1_mag.value()
         self.frMag = self.m2_mag.value()
         self.blMag = self.m3_mag.value()
