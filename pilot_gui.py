@@ -429,7 +429,7 @@ class Gui(QWidget):
         else:
             pass
         #self._timer = QTimer(self)
-        self._timer.timeout.connect(self.play1)
+        #self._timer.timeout.connect(self.play1)
         #self._timer.start(27)
     
     def on_slider2_changed(self):
@@ -446,8 +446,8 @@ class Gui(QWidget):
         else:
             pass
         #self._timer = QTimer(self)
-        self._timer.timeout.connect(self.play2)
-        self._timer.start(27)
+        #self._timer.timeout.connect(self.play2)
+        #self._timer.start(27)
         
     #------------What is to follow should be moved into a seprate file----------------------------
     def string_formatter(self):
