@@ -85,12 +85,12 @@ class MGui(QWidget):
         m5_btn = QPushButton('Flip Direction'); m5_btn.clicked.connect(self.flipft)
         m6_btn = QPushButton('Flip Direction'); m6_btn.clicked.connect(self.flipbt)
         
-        self.m1_val = QSpinBox(); self.m1_val.setValue(Gui.fltV); self.m1_val.setRange(-1, 1)
-        self.m2_val = QSpinBox(); self.m2_val.setValue(Gui.frtV); self.m2_val.setRange(-1, 1)
-        self.m3_val = QSpinBox(); self.m3_val.setValue(Gui.bltV); self.m3_val.setRange(-1, 1)
-        self.m4_val = QSpinBox(); self.m4_val.setValue(Gui.brtV); self.m4_val.setRange(-1, 1)
-        self.m5_val = QSpinBox(); self.m5_val.setValue(Gui.ftV); self.m5_val.setRange(-1, 1)
-        self.m6_val = QSpinBox(); self.m6_val.setValue(Gui.btV); self.m6_val.setRange(-1, 1)
+        self.m1_val = QSpinBox(); self.m1_val.setRange(-1, 1); self.m1_val.setValue(Gui.fltV)
+        self.m2_val = QSpinBox(); self.m2_val.setRange(-1, 1); self.m2_val.setValue(Gui.frtV)
+        self.m3_val = QSpinBox(); self.m3_val.setRange(-1, 1); self.m3_val.setValue(Gui.bltV) 
+        self.m4_val = QSpinBox(); self.m4_val.setRange(-1, 1); self.m4_val.setValue(Gui.brtV)
+        self.m5_val = QSpinBox(); self.m5_val.setRange(-1, 1); self.m5_val.setValue(Gui.ftV)
+        self.m6_val = QSpinBox(); self.m6_val.setRange(-1, 1); self.m6_val.setValue(Gui.btV)
 
         self.m1_num = QSpinBox(); self.m1_num.setRange(1, 6); self.m1_num.setValue(Gui.fltO)
         self.m2_num = QSpinBox(); self.m2_num.setRange(1, 6); self.m2_num.setValue(Gui.frtO)
@@ -100,10 +100,10 @@ class MGui(QWidget):
         self.m6_num = QSpinBox(); self.m6_num.setRange(1, 6); self.m6_num.setValue(Gui.btO)
         
         self.str_disp = QTextEdit('blank')
-        str_disp_btn = QPushButton('Display String Order'); str_disp_btn.clicked.connect(self.stringcode)
-        
+        str_disp_btn = QPushButton('Update String'); str_disp_btn.clicked.connect(self.stringcode)
+
         grid = QGridLayout()              #Create layout container
-        
+
         grid.addWidget(name_lbl, 1, 1)
         grid.addWidget(val_lbl, 1, 2)
         grid.addWidget(btn_lbl, 1, 3)
@@ -207,7 +207,6 @@ class MGui(QWidget):
         Gui.brtV = self.m4_val.value()
         Gui.ftV = self.m5_val.value()
         Gui.btV = self.m6_val.value()
-        
 
         self.flMag = self.m1_mag.value()
         self.frMag = self.m2_mag.value()
@@ -235,7 +234,7 @@ class MGui(QWidget):
         # To go up/down
         self.front_thruster = int(1500 + (MGui.ftV)*self.fMag)
         self.back_thruster = int(1500 + (MGui.btV)*self.bMag)
-        
+
         self.stringThrust = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
                               self.bck_right_thruster, self.front_thruster, self.back_thruster]
         self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
@@ -250,8 +249,8 @@ class MGui(QWidget):
         self.stringToDisplay = (str(self.stringName_s)+ '\n' + str(self.stringThrust_s) + '\n' + str(self.stringFlip_s))
         print(self.stringThrust_s)
         self.str_disp.setText(self.stringToDisplay)
-        
-        
+
+
         with open("order.txt", "w") as ofile:
             ofile.write(str(self.stringOrderNumbers))
         with open("flip.txt", "w") as ffile:
@@ -671,11 +670,14 @@ DB
         with open("order.txt", "r") as ofile:
             order_data = eval(ofile.readline())
             
-        thruster_string = [self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
-                           self.bck_right_thruster, self.back_thruster, self.bck_left_thruster]
+        #thruster_string = [self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
+                           #self.bck_right_thruster, self.back_thruster, self.bck_left_thruster] OLD
+        thruster_string = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
+                           self.bck_right_thruster, self.front_thruster, self.back_thruster]
+
         self.thruster_string_ordered = [thruster_string[i-1] for i in order_data]
         self.frontend.set_thrusts(self.thruster_string_ordered)
-        #print(thruster_string)
+        
 
 
     def information(self):
@@ -705,14 +707,6 @@ DB
         self.string_formatter()  # Calling the thruster value
         self.frontend.send_settings()   # send settings including parameters
 
-        
-    def set_values(self):
-        self.depth_reading.setText(str(self.frontend.get_depth()))
-        x_value = self.frontend.get_imu()[0]
-        y_value = self.frontend.get_imu()[1]
-        self.IMUx_reading.setText(str(x_value))
-        self.IMUy_reading.setText(str(y_value))
-        
 
 #---------------- beginning of video class
 class Video():
