@@ -40,9 +40,14 @@ GRAB = 0
 EM1 = 0
 EM2 = 0
 LEVELM = 0
+DEBUGFLAG = 0
 
 class MGui(QWidget):
 #base class of all user interface objects. 
+
+    def closeEvent(self, event):
+        global DEBUGFLAG
+        DEBUGFLAG = 0
 
     def __init__(self, parent=None):
         super(MGui, self).__init__()
@@ -268,7 +273,7 @@ class Gui(QWidget):
         self.initUI()
         with open("order.txt", "r") as ofile:
             odata = eval(ofile.readline())
-
+            
         Gui.fltO = odata[0]
         Gui.frtO = odata[1]
         Gui.bltO = odata[2]
@@ -423,7 +428,10 @@ class Gui(QWidget):
         self.show()
 
     def on_motor_btn_clicked(self):
+        global DEBUGFLAG
+        DEBUGFLAG = 1
         self.motorWindow = MGui(self)
+        self.motorWindow.stringThrust_s = [1500, 1500, 1500, 1500, 1500, 1500]
 
     def screenshot_and_length(self):
         cv2.imwrite("test1.png", self.video1.currentFrame)
@@ -530,6 +538,7 @@ DB
         global EM1
         global EM2
         global LEVELM
+        global DEBUGFLAG
 
         # ================================ Thrusters Power ================================
         """
@@ -674,8 +683,12 @@ DB
                            #self.bck_right_thruster, self.back_thruster, self.bck_left_thruster] OLD
         thruster_string = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
                            self.bck_right_thruster, self.front_thruster, self.back_thruster]
+        if (DEBUGFLAG == 0):
+            self.thruster_string_ordered = [thruster_string[i-1] for i in order_data]
+        
+        if (DEBUGFLAG == 1):
+            self.thruster_string_ordered = self.motorWindow.stringThrust_s
 
-        self.thruster_string_ordered = [thruster_string[i-1] for i in order_data]
         self.frontend.set_thrusts(self.thruster_string_ordered)
         
 

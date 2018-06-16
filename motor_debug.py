@@ -10,6 +10,8 @@ app = QApplication(sys.argv) # Creat a new QApplication object. This manages
                             
 class MGui(QWidget):
 #base class of all user interface objects. 
+    def closeEvent(self, event):
+        print("closed")
 
     def __init__(self, parent=None):
         super(MGui, self).__init__()
@@ -36,7 +38,7 @@ class MGui(QWidget):
         self.m4_mag = QSpinBox(); self.m4_mag.setRange(-400, 400); self.m4_mag.setValue(0); self.m4_mag.valueChanged.connect(self.stringcode)
         self.m5_mag = QSpinBox(); self.m5_mag.setRange(-400, 400); self.m5_mag.setValue(0); self.m5_mag.valueChanged.connect(self.stringcode)
         self.m6_mag = QSpinBox(); self.m6_mag.setRange(-400, 400); self.m6_mag.setValue(0); self.m6_mag.valueChanged.connect(self.stringcode)
-
+        #self.m6_mag.setReadOnly(True)
         m1_btn = QPushButton('Flip Direction'); m1_btn.clicked.connect(self.flipflt)
         m2_btn = QPushButton('Flip Direction'); m2_btn.clicked.connect(self.flipfrt)
         m3_btn = QPushButton('Flip Direction'); m3_btn.clicked.connect(self.flipblt)
