@@ -296,8 +296,8 @@ class Gui(QWidget):
         self.thread.start() #Start the thread
 
         #video 
-        self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))        #an object of class Video(argument)
-        self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
+        self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))        #an object of class Video(argument)
+        self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.play1)
         self._timer.timeout.connect(self.play2)
@@ -356,11 +356,11 @@ class Gui(QWidget):
         self.length_det_btn.clicked.connect(self.screenshot_and_length)        
 
         self.cam_slider1 = QSlider()
-        self.cam_slider1.setRange(0, 3)
+        self.cam_slider1.setRange(0, 4)
         self.cam_slider1.setTickPosition(0) #sets tick position to either side of the slider
         self.cam_slider1.valueChanged.connect(self.on_slider1_changed)
         self.cam_slider2 = QSlider()
-        self.cam_slider2.setRange(0, 3)
+        self.cam_slider2.setRange(0, 4)
         self.cam_slider2.setTickPosition(0)
         self.cam_slider2.setSliderPosition(1)
         self.cam_slider2.valueChanged.connect(self.on_slider2_changed)
@@ -417,15 +417,15 @@ class Gui(QWidget):
 
     def on_slider1_changed(self):
         if (self.cam_slider1.value() ==0):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))
         if (self.cam_slider1.value() ==1):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider1.value() ==2):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8083"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
         if (self.cam_slider1.value() ==3):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8084"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
         if (self.cam_slider1.value() ==4):
-            self.video1 = Video(cv2.VideoCapture("http://192.168.1.101:8085"))
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         else:
             pass
         #self._timer = QTimer(self)
@@ -434,15 +434,15 @@ class Gui(QWidget):
     
     def on_slider2_changed(self):
         if (self.cam_slider2.value() ==0):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8081"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8081"))
         if (self.cam_slider2.value() ==1):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8082"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider2.value() ==2):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8083"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
         if (self.cam_slider2.value() ==3):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8084"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
         if (self.cam_slider2.value() ==4):
-            self.video2 = Video(cv2.VideoCapture("http://192.168.1.101:8085"))
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         else:
             pass
         #self._timer = QTimer(self)
