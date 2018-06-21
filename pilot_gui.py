@@ -240,14 +240,25 @@ class MGui(QWidget):
         self.front_thruster = int(1500 + (MGui.ftV)*self.fMag)
         self.back_thruster = int(1500 + (MGui.btV)*self.bMag)
 
-        self.stringThrust = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
-                              self.bck_right_thruster, self.front_thruster, self.back_thruster]
-        self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
-        self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
-                            self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
-        self.stringOrderNumbers = [self.m1_num.value(), self.m2_num.value(), self.m3_num.value(), 
-                            self.m4_num.value(), self.m5_num.value(), self.m6_num.value()]
-        self.stringFlip = [MGui.fltV, MGui.frtV, MGui.bltV, MGui.brtV, MGui.ftV, MGui.btV]
+        #self.stringThrust = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
+                              #self.bck_right_thruster, self.front_thruster, self.back_thruster]    defo works
+        #self.stringName = ['fwd_left_t', 'fwd_right_t', 'back_left_t', 'back_right_t', 'front_t', 'back_t']
+        #self.stringFlip = [MGui.fltV, MGui.frtV, MGui.bltV, MGui.brtV, MGui.ftV, MGui.btV]
+        #self.stringOrder = [self.m1_num.value()-1, self.m2_num.value()-1, self.m3_num.value()-1, 
+                                #self.m4_num.value()-1, self.m5_num.value()-1, self.m6_num.value()-1]
+        #self.stringOrderNumbers = [self.m1_num.value(), self.m2_num.value(), self.m3_num.value(), 
+                                       #self.m4_num.value(), self.m5_num.value(), self.m6_num.value()]
+
+        self.stringThrust = [self.bck_left_thruster, self.fwd_left_thruster, self.fwd_right_thruster,
+                           self.front_thruster, self.back_thruster, self.bck_right_thruster]    #maybe works
+        self.stringName = ['back_left_t', 'fwd_left_t', 'fwd_right_t', 'front_t', 'back_t', 'back_right_t']
+        self.stringFlip = [MGui.bltV, MGui.fltV, MGui.frtV, MGui.ftV, MGui.btV, MGui.brtV]
+
+        self.stringOrder = [self.m1_num.value()-1, self.m5_num.value()-1, self.m2_num.value()-1, 
+                            self.m4_num.value()-1, self.m6_num.value()-1, self.m3_num.value()-1]
+        self.stringOrderNumbers = [self.m1_num.value(), self.m5_num.value(), self.m2_num.value(), 
+                            self.m4_num.value(), self.m6_num.value(), self.m3_num.value()]
+
         self.stringThrust_s = [self.stringThrust[i] for i in self.stringOrder]
         self.stringName_s = [self.stringName[i] for i in self.stringOrder]
         self.stringFlip_s = [self.stringFlip[i] for i in self.stringOrder]
@@ -271,28 +282,43 @@ class Gui(QWidget):
         super(Gui, self).__init__()
 
         self.initUI()
+
+        #with open("order.txt", "r") as ofile:
+            #odata = eval(ofile.readline())
+        #Gui.fltO = odata[0]
+        #Gui.frtO = odata[1]
+        #Gui.bltO = odata[2]
+        #Gui.brtO = odata[3]
+        #Gui.ftO = odata[4]
+        #Gui.btO = odata[5]
+
+        #with open("flip.txt", "r") as ffile:
+            #fdata = eval(ffile.readline())            
+        #Gui.fltV = fdata[0]
+        #Gui.frtV = fdata[1]
+        #Gui.bltV = fdata[2]
+        #Gui.brtV = fdata[3]
+        #Gui.ftV = fdata[4]
+        #Gui.btV = fdata[5]
+
         with open("order.txt", "r") as ofile:
             odata = eval(ofile.readline())
-            
-        Gui.fltO = odata[0]
-        Gui.frtO = odata[1]
-        Gui.bltO = odata[2]
-        Gui.brtO = odata[3]
-        Gui.ftO = odata[4]
-        Gui.btO = odata[5]
+        Gui.bltO = odata[0]
+        Gui.fltO = odata[1]
+        Gui.frtO = odata[2]
+        Gui.ftO = odata[3]
+        Gui.btO = odata[4]
+        Gui.brtO = odata[5]
 
         with open("flip.txt", "r") as ffile:
-            fdata = eval(ffile.readline())
-            
-        Gui.fltV = fdata[0]
-        Gui.frtV = fdata[1]
-        Gui.bltV = fdata[2]
-        Gui.brtV = fdata[3]
-        Gui.ftV = fdata[4]
-        Gui.btV = fdata[5]
+            fdata = eval(ffile.readline())            
+        Gui.bltV = fdata[0]
+        Gui.fltV = fdata[1]
+        Gui.frtV = fdata[2]
+        Gui.ftV = fdata[3]
+        Gui.btV = fdata[4]
+        Gui.brtV = fdata[5]
 
-
-        #self.motorWindow = MGui(self)
         
         self.frontend = ROV("192.168.1.4", 8000)
 
@@ -427,15 +453,55 @@ class Gui(QWidget):
         self.setWindowTitle('Pilot GUI')    
         self.show()
 
+
     def on_motor_btn_clicked(self):
         global DEBUGFLAG
         DEBUGFLAG = 1
+
+        #with open("order.txt", "r") as ofile:
+            #odata = eval(ofile.readline())
+        #Gui.fltO = odata[0]
+        #Gui.frtO = odata[1]
+        #Gui.bltO = odata[2]
+        #Gui.brtO = odata[3]
+        #Gui.ftO = odata[4]
+        #Gui.btO = odata[5]
+
+        #with open("flip.txt", "r") as ffile:
+            #fdata = eval(ffile.readline())            
+        #Gui.fltV = fdata[0]
+        #Gui.frtV = fdata[1]
+        #Gui.bltV = fdata[2]
+        #Gui.brtV = fdata[3]
+        #Gui.ftV = fdata[4]
+        #Gui.btV = fdata[5]
+
+        with open("order.txt", "r") as ofile:
+            odata = eval(ofile.readline())
+        Gui.bltO = odata[0]
+        Gui.fltO = odata[1]
+        Gui.frtO = odata[2]
+        Gui.ftO = odata[3]
+        Gui.btO = odata[4]
+        Gui.brtO = odata[5]
+
+        with open("flip.txt", "r") as ffile:
+            fdata = eval(ffile.readline())            
+        Gui.bltV = fdata[0]
+        Gui.fltV = fdata[1]
+        Gui.frtV = fdata[2]
+        Gui.ftV = fdata[3]
+        Gui.btV = fdata[4]
+        Gui.brtV = fdata[5]
+
         self.motorWindow = MGui(self)
         self.motorWindow.stringThrust_s = [1500, 1500, 1500, 1500, 1500, 1500]
+
 
     def screenshot_and_length(self):
         cv2.imwrite("test1.png", self.video1.currentFrame)
         self.detect_length = UndistortAND_Distance_Detection.Example()
+
 
     def tail_det(self):
         #os.system("PATH OF FILE")
@@ -449,10 +515,7 @@ class Gui(QWidget):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider1.value() ==2):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
-        #if (self.cam_slider1.value() ==3):
-            #self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
-        #if (self.cam_slider1.value() ==4):
-            #self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
+        
         else:
             pass
         #self._timer = QTimer(self)
@@ -466,10 +529,7 @@ class Gui(QWidget):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider2.value() ==2):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
-        #if (self.cam_slider2.value() ==3):
-            #self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
-        #if (self.cam_slider2.value() ==4):
-            #self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
+        
         else:
             pass
         #self._timer = QTimer(self)
@@ -630,26 +690,6 @@ DB
             self.icon3.change_colour("0, 255, 0")
 
 
-        # # DB1
-        # if (self.DB1_button == 1):
-        #     DB1 = 0
-        #     self.frontend.set_lift_bag_release(DB1, 0)
-        #     self.icon4.change_colour("255, 0, 0")
-        # else:
-        #     DB1 = 1
-        #     self.frontend.set_lift_bag_release(DB1, 0)
-        #     self.icon4.change_colour("0, 255, 0")
-        #
-        # # DB2
-        # if (self.DB2_button == 1):
-        #     DB2 = 0
-        #     self.frontend.set_lift_bag_release(DB2, 1)
-        #     self.icon5.change_colour("255, 0, 0")
-        # else:
-        #     DB2 = 1
-        #     self.frontend.set_lift_bag_release(DB2, 1)
-        #     self.icon5.change_colour("0, 255, 0")
-
         # GRAB
         if (self.GRAB_button == 1):
             GRAB = 1
@@ -679,10 +719,11 @@ DB
         with open("order.txt", "r") as ofile:
             order_data = eval(ofile.readline())
             
-        #thruster_string = [self.fwd_left_thruster, self.front_thruster, self.fwd_right_thruster,
-                           #self.bck_right_thruster, self.back_thruster, self.bck_left_thruster] OLD
-        thruster_string = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
-                           self.bck_right_thruster, self.front_thruster, self.back_thruster]
+        #thruster_string = [self.fwd_left_thruster, self.fwd_right_thruster, self.bck_left_thruster,
+                           #self.bck_right_thruster, self.front_thruster, self.back_thruster]    defo works
+
+        thruster_string = [self.bck_left_thruster, self.fwd_left_thruster, self.fwd_right_thruster,
+                           self.front_thruster, self.back_thruster, self.bck_right_thruster]    #maybe works
         if (DEBUGFLAG == 0):
             self.thruster_string_ordered = [thruster_string[i-1] for i in order_data]
         
