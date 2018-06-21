@@ -515,6 +515,10 @@ class Gui(QWidget):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider1.value() ==2):
             self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
+        if (self.cam_slider1.value() ==3):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
+        if (self.cam_slider1.value() ==4):
+            self.video1 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         
         else:
             pass
@@ -529,6 +533,10 @@ class Gui(QWidget):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8082"))
         if (self.cam_slider2.value() ==2):
             self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8083"))
+        if (self.cam_slider2.value() ==3):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8084"))
+        if (self.cam_slider2.value() ==4):
+            self.video2 = Video(cv2.VideoCapture("http://192.168.1.5:8085"))
         
         else:
             pass
