@@ -381,13 +381,20 @@ class Gui(QWidget):
         self.indicator4 = QLabel('Grabber enabled?')
         self.indicator5 = QLabel('Levelling motor')
         
-        self.depth_lbl = QLabel('Depth Reading:')
+        depth_lbl = QLabel('Respective Depth Reading:')
+        self.depth = QLineEdit()
+        self.depth.setText('0.0')
+        rec_depth_lbl = QLabel('Recorded Depth Reading:')
+        self.rec_depth = QLineEdit()
+        self.rec_depth.setText('0.0')
+        depth_record_btn = QPushButton('Record Depth')
+        depth_record_btn.clicked.connect(self.calculate_recorded_depth)
+        
+
         self.IMUx_lbl = QLabel('IMU X Value')
         self.IMUy_lbl = QLabel('IMU Y Value')        
-        self.depth_reading = QTextEdit()
         self.IMUx_reading = QLineEdit()
         self.IMUy_reading = QLineEdit()
-        #self.IMU_txt_lbl = 
         self.IMU_txt = QTextEdit()
         
         self.motor_debug_btn = QPushButton('MOTOR DEBUG')
@@ -436,22 +443,41 @@ class Gui(QWidget):
         grid.addWidget(self.icon3, 8, 2)
         grid.addWidget(self.icon4, 9, 2)
         grid.addWidget(self.icon5, 10, 2)
-        grid.addWidget(self.depth_lbl, 11, 1)
-        grid.addWidget(self.depth_reading, 11, 2)
-        grid.addWidget(self.IMUx_lbl, 12, 1)
-        grid.addWidget(self.IMUx_reading, 12, 2)
-        grid.addWidget(self.IMUy_lbl, 13, 1)
-        grid.addWidget(self.IMUy_reading, 13, 2)
+
+        p_calc.addWidget(depth_record_btn, 11, 1)
+        p_calc.addWidget(depth_lbl, 12, 1); p_calc.addWidget(self.depth, 12, 2)
+        p_calc.addWidget(rec_depth_lbl, 13, 1); p_calc.addWidget(self.rec_depth, 13, 2)
+
+        grid.addWidget(self.IMUx_lbl, 14, 1)
+        grid.addWidget(self.IMUx_reading, 14, 2)
+        grid.addWidget(self.IMUy_lbl, 15, 1)
+        grid.addWidget(self.IMUy_reading, 15, 2)
         grid.addWidget(self.IMU_txt, 6, 4, 5, 2)
 
-        grid.addWidget(self.motor_debug_btn, 12, 4)
-        grid.addWidget(self.length_det_btn, 13, 4)
-        grid.addWidget(self.tail_det_btn, 13, 5)    
+        grid.addWidget(self.motor_debug_btn, 14, 4)
+        grid.addWidget(self.length_det_btn, 15, 4)
+        grid.addWidget(self.tail_det_btn, 15, 5)    
         self.setLayout(grid)    #Set the layout
 
         self.setGeometry(10, 200, 600, 300)
         self.setWindowTitle('Pilot GUI')    
         self.show()
+
+
+    def calculate_recorded_depth(self):
+        current_depth = str(self.depth.text()))  #set to whatever value is in current box
+        #recorded_depth = current_depth
+        #depth_diff = current_depth - recorded_depth #sets value
+        #self.depth.setText(str(depth_diff))
+        self.rec_depth.setText(str(current_depth))
+        self.calculate_current_depth
+
+
+    def calculate_current_depth(self):
+        current_box_depth = float(str(self.depth.text()))  #set to whatever value is in current box
+        rec_box_depth = float(str(self.rec_depth.text())) #set to whatever value is in recorded box
+        depth_difference = current_box_depth - rec_box_depth #sets value
+        self.depth.setText(str(depth_difference))
 
 
     def on_motor_btn_clicked(self):
@@ -756,8 +782,8 @@ DB
             if (var[0] == 'w'):
                 self.IMU_txt.setText(var[1:])
             if (var[0] == 'd'):
-                self.depth
-                self.depth_reading.setText(var[1:])
+                self.depth.setText(var[1:])
+                self.calculate_current_depth
             else:
                 print(var)
             #self.IMU_txt.setText(var)
