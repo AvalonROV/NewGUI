@@ -18,7 +18,6 @@ class Example(QtGui.QWidget):
     def __init__(self):
         super(Example, self).__init__()
          
-        self.initUI()
         self.textBox()
         
         self.y_cordinate=0
@@ -55,41 +54,41 @@ class Example(QtGui.QWidget):
         self.y_cordinate = current.y()
     
     def buttonStore1(self):
-        self.btn=QtGui.QPushButton("R",self)
-        self.btn.resize(50,50)
-        self.btn.move(100,50)
+        self.btn=QtGui.QPushButton("Press for First Point",self)
+        #self.btn.resize(100,50)
+        self.btn.adjustSize()
+        self.btn.move(700,150)
         self.btn.setStyleSheet("QPushButton { background-color: white }""QPushButton:pressed { background-color: lightgreen }" )
         
-        self.btn1=QtGui.QPushButton("P",self)
-        self.btn1.resize(50,50)
-        self.btn1.move(200,50)
+        self.btn1=QtGui.QPushButton("Press for Second Point",self)
+        #self.btn1.resize(100,50)
+        self.btn1.adjustSize()
+        self.btn1.move(700,200)
         self.btn1.setStyleSheet("QPushButton { background-color: white }""QPushButton:pressed { background-color: lightgreen }" )
    
-        self.btn2=QtGui.QPushButton("CALCULATE",self)
-        self.btn2.resize(100,50)
-        self.btn2.move(400,20)
+        self.btn2=QtGui.QPushButton("RESULT",self)
+        self.btn2.adjustSize()
+#        self.btn2.resize(100,50)
+        self.btn2.move(800,350)
         self.btn2.setStyleSheet("QPushButton { background-color: white }""QPushButton:pressed { background-color: lightgreen }" )
 
-        self.btn3=QtGui.QPushButton("SLOPE",self)
-        self.btn3.resize(100,50)
-        self.btn3.move(700,20)
+        self.btn3=QtGui.QPushButton("Slope",self)
+        self.btn3.adjustSize()
+#        self.btn3.resize(100,50)
+        self.btn3.move(700,350)
         self.btn3.setStyleSheet("QPushButton { background-color: white }""QPushButton:pressed { background-color: lightgreen }" )
         
-        self.btn4=QtGui.QPushButton("Input Required Distance",self)
-        self.btn4.resize(50,50)
-        self.btn4.move(800,200)
+        self.btn4=QtGui.QPushButton("Enter and Press for Required Distance",self)
+        self.btn4.adjustSize()
+#        self.btn4.resize(50,50)
+        self.btn4.move(700,70)
         self.btn4.setStyleSheet("QPushButton { background-color: white }""QPushButton:pressed { background-color: lightgreen }" )
         self.show()
         
     def textBox(self):
         self.textbox = QtGui.QLineEdit(self)
-        self.textbox.move(800, 100)
-        self.textbox.resize(100,50)
-    
-    def initUI(self):                       
-        qbtn = QtGui.QPushButton('Quit', self)
-        qbtn.resize(100,50)
-        qbtn.move(800, 50)
+        self.textbox.move(700, 30)
+        self.textbox.resize(100,30)
         
     def click(self):
         self.RequiredDistance=float(self.textbox.text())
@@ -127,14 +126,14 @@ class Example(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         
         #---------IMAGE UNDISTORTION----------#
-        img = cv2.imread('test1.png')
-        h,w = img.shape[:2]
-        self.newcameramtx, self.roi=cv2.getOptimalNewCameraMatrix(self.mtx,self.dist,(w,h),1,(w,h))
-        dst = cv2.undistort(img, self.mtx, self.dist, None, self.newcameramtx)
-        cv2.imwrite('cal1.png',dst)
+#        img = cv2.imread('test1.png')
+#        h,w = img.shape[:2]
+#        self.newcameramtx, self.roi=cv2.getOptimalNewCameraMatrix(self.mtx,self.dist,(w,h),1,(w,h))
+#        dst = cv2.undistort(img, self.mtx, self.dist, None, self.newcameramtx)
+#        cv2.imwrite('cal1.png',dst)
         #-------------------------------------#
         
-        pixmap = QtGui.QPixmap("cal1.png")
+        pixmap = QtGui.QPixmap("sample.png")
         painter.drawPixmap(10, 100,640,480, pixmap)
 #        painter.drawPixmap(self,10, pixmap)
         pen = QtGui.QPen(QtCore.Qt.blue, 3)
